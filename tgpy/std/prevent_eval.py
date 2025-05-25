@@ -6,9 +6,9 @@
 
 import re
 
-from telethon import TelegramClient
-from telethon.tl.custom import Message
-from telethon.tl.types import MessageActionTopicCreate, MessageService
+from pyrogram import Client as TelegramClient
+from pyrogram.enums import MessageServiceType
+from pyrogram.types import Message, MessageService
 
 import tgpy.api
 from tgpy import Context, reactions_fix
@@ -26,15 +26,15 @@ INTERRUPT_RGX = re.compile(r'(?i)^(stop|ыещз)$')
 async def cancel_message(message: Message, permanent: bool = True) -> bool:
     parsed = tgpy.api.parse_tgpy_message(message)
 
-    if task := running_messages.get((message.chat_id, message.id)):
+    if task := running_messages.get((message.chat.id, message.id)):
         task.cancel()
     if not parsed.is_tgpy_message:
         return False
-    message = await message.edit(parsed.code)
+    message = await message.edit_text(parsed.code)
 
     if permanent:
         ignored_messages = tgpy.api.config.get(IGNORED_MESSAGES_KEY, [])
-        ignored_messages.append([message.chat_id, message.id])
+        ignored_messages.append([message.chat.id, message.id]) 
         tgpy.api.config.save()
     else:
         reactions_fix.update_hash(message)
@@ -43,14 +43,14 @@ async def cancel_message(message: Message, permanent: bool = True) -> bool:
 
 
 async def handle_cancel(message: Message, permanent: bool = True):
-    target: Message | None = await message.get_reply_message()
+    target: Message | None = message.reply_to_message
     thread_id = None
 
     if (
         target
-        and target.fwd_from
-        and target.fwd_from.from_id == target.from_id
-        and target.fwd_from.saved_from_peer == target.from_id
+        and target.forward_origin.sender_user
+        and target.forward_origin.sender_user.id == target.from_user.id
+        and target.forward_from_chat and target.forward_from_chat.id == target.from_user.id
     ):
         # Message from bound channel. Probably sent cancel from comments.
         # Searching for messages to cancel only in this comment thread
@@ -59,8 +59,8 @@ async def handle_cancel(message: Message, permanent: bool = True):
 
     if (
         target
-        and isinstance(target, MessageService)
-        and isinstance(target.action, MessageActionTopicCreate)
+        and hasattr(target, 'service') and target.service
+        and hasattr(target, 'service_type') and target.service_type == MessageServiceType.TOPIC_CREATE
     ):
         # Message sent to a topic (without replying to any other message).
         # Searching for messages to cancel only in this topic
@@ -68,10 +68,10 @@ async def handle_cancel(message: Message, permanent: bool = True):
         target = None
 
     if not target:
-        async for msg in client.iter_messages(
-            message.chat_id, max_id=message.id, reply_to=thread_id, limit=10
+        async for msg in client.get_chat_history(
+            message.chat.id, limit=10, offset_id=message.id, replies=thread_id
         ):
-            if not msg.out:
+            if not msg.outgoing:  # Changed from msg.out to msg.outgoing
                 continue
             parsed = tgpy.api.parse_tgpy_message(msg)
             if parsed.is_tgpy_message:
@@ -87,7 +87,7 @@ async def handle_cancel(message: Message, permanent: bool = True):
 
 async def handle_comment(message: Message):
     ignored_messages = tgpy.api.config.get(IGNORED_MESSAGES_KEY, [])
-    ignored_messages.append([message.chat_id, message.id])
+    ignored_messages.append([message.chat.id, message.id]) 
     tgpy.api.config.save()
 
     entities = message.entities or []
@@ -97,17 +97,17 @@ async def handle_comment(message: Message):
             ent.offset = 0
         else:
             ent.offset -= 2
-    await message.edit(message.raw_text[2:], formatting_entities=entities)
+    await message.edit_text(message.text[2:], entities=entities)  
 
 
 async def exec_hook(message: Message, is_edit: bool):
     ignored_messages = tgpy.api.config.get(IGNORED_MESSAGES_KEY, [])
-    if [message.chat_id, message.id] in ignored_messages:
+    if [message.chat.id, message.id] in ignored_messages:
         return False
 
-    is_comment = message.raw_text.startswith('//') and message.raw_text[2:].strip()
-    is_cancel = CANCEL_RGX.fullmatch(message.raw_text) is not None
-    is_interrupt = INTERRUPT_RGX.fullmatch(message.raw_text) is not None
+    is_comment = message.text.startswith('//') and message.text[2:].strip() if message.text else False
+    is_cancel = CANCEL_RGX.fullmatch(message.text) is not None if message.text else False
+    is_interrupt = INTERRUPT_RGX.fullmatch(message.text) is not None if message.text else False
     if not is_comment and not is_cancel and not is_interrupt:
         return True
 

@@ -1,6 +1,6 @@
 import logging
 
-from telethon import TelegramClient
+from pyrogram import Client
 
 from tgpy.context import Context
 from tgpy.version import __version__
@@ -10,11 +10,11 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
     level=logging.INFO,
 )
-logging.getLogger('telethon').setLevel(logging.WARNING)
+logging.getLogger('pyrogram').setLevel(logging.WARNING)
 
 
 class App:
-    client: TelegramClient
+    client: Client
     ctx: Context
 
     def __init__(self):

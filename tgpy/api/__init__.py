@@ -10,7 +10,6 @@ from .utils import (
     get_running_version,
     get_user,
     installed_as_package,
-    outgoing_messages_filter,
     running_in_docker,
     tokenize_string,
     try_await,
@@ -45,7 +44,6 @@ __all__ = [
     'get_hostname',
     'running_in_docker',
     'try_await',
-    'outgoing_messages_filter',
     'tokenize_string',
     'untokenize_to_string',
 ]

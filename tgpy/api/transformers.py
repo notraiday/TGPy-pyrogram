@@ -2,7 +2,7 @@ import ast
 import logging
 from typing import Awaitable, Callable, Generic, Iterator, Literal, TypeVar
 
-from telethon.tl.custom import Message
+from pyrogram.types import Message
 
 from tgpy.api.utils import try_await
 

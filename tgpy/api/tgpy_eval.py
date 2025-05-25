@@ -3,7 +3,7 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
-from telethon.tl.custom import Message
+from pyrogram.types import Message
 
 import tgpy.api
 from tgpy import app
@@ -38,12 +38,13 @@ class Flusher:
 
     async def _wait_and_flush(self):
         await asyncio.sleep(3)
-        await message_design.edit_message(
-            self._message,
-            self._code,
-            output=self._flushed_output,
-            is_running=True,
-        )
+        if self._message:
+            await message_design.edit_message(
+                self._message,
+                self._code,
+                output=self._flushed_output,
+                is_running=True,
+            )
         self._flush_timer = None
 
     def flush_handler(self):
@@ -88,12 +89,12 @@ async def tgpy_eval(
         app.ctx._set_msg(message)
     if not filename:
         if message:
-            filename = f'{FILENAME_PREFIX}message/{message.chat_id}/{message.id}'
+            filename = f'{FILENAME_PREFIX}message/{message.chat.id}/{message.id}'
         else:
             filename = f'{FILENAME_PREFIX}eval/{numid()}'
     if parsed.uses_orig:
         if message:
-            orig = await message.get_reply_message()
+            orig = message.reply_to_message
             kwargs['orig'] = orig
         else:
             kwargs['orig'] = None

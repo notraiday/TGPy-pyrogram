@@ -9,9 +9,10 @@ import sys
 import aiorun
 import yaml
 from rich.console import Console, Theme
-from telethon import TelegramClient, errors
+from pyrogram import Client, errors
 from yaml import YAMLError
 
+from tgpy import __version__ as tgpy_version
 from tgpy import app
 from tgpy._handlers import add_handlers
 from tgpy.api import DATA_DIR, MODULES_DIR, WORKDIR, config
@@ -33,8 +34,9 @@ async def ainput(prompt: str, password: bool = False):
     )
 
 
-def get_api_id() -> str | None:
-    return os.getenv('TGPY_API_ID') or config.get('core.api_id')
+def get_api_id() -> int | None:
+    api_id = os.getenv('TGPY_API_ID') or config.get('core.api_id')
+    return int(api_id) if api_id else None
 
 
 def get_api_hash() -> str | None:
@@ -59,31 +61,22 @@ def create_client():
             .replace('Model', '')
             .split()
         )
-
-    client = TelegramClient(
+        
+    client = Client(
         str(SESSION_FILENAME),
         get_api_id(),
         get_api_hash(),
         device_model=device_model,
         system_version=platform.platform(),
+        app_version=f'TGPy {tgpy_version}',
         lang_code='en',
-        system_lang_code='en-US',
-        proxy=config.get('core.proxy', None),
+        workdir=str(WORKDIR)
     )
-    client.parse_mode = 'html'
     return client
 
 
 async def start_client():
-    await app.client.start(
-        phone=functools.partial(ainput, '| Please enter your phone number: '),
-        code_callback=functools.partial(
-            ainput, '| Please enter the code you received: '
-        ),
-        password=functools.partial(
-            ainput, '| Please enter your 2FA password: ', password=True
-        ),
-    )
+    await app.client.start()
 
 
 async def initial_setup():
@@ -101,25 +94,46 @@ async def initial_setup():
     )
     success = False
     while not success:
-        config.set('core.api_id', int(await ainput('│ Please enter api_id: ')))
-        config.set('core.api_hash', await ainput('│ ...and api_hash: '))
         try:
-            app.client = create_client()
+            api_id_input = await ainput('│ Please enter api_id: ')
+            api_hash_input = await ainput('│ ...and api_hash: ')
+            if not api_id_input or not api_hash_input:
+                console.print(
+                    '│ [bold #ffffff on #ed1515]API ID and API Hash cannot be empty. Please try again.'
+                )
+                continue
+            config.set('core.api_id', int(api_id_input))
+            config.set('core.api_hash', api_hash_input)
+            
+            temp_client = Client(
+                name="tgpy_setup_check",
+                api_id=int(api_id_input),
+                api_hash=api_hash_input,
+                in_memory=True
+            )
             console.print()
             console.print('[bold #7f8c8d on #ffffff] Step 2 of 2 ')
             console.print('│ Now login to Telegram.')
-            await app.client.connect()
-            await start_client()
+            
+            await temp_client.connect()
+            await temp_client.disconnect()
             success = True
-        except (errors.ApiIdInvalidError, errors.ApiIdPublishedFloodError, ValueError):
+        except errors.ApiIdInvalid:
             console.print(
                 '│ [bold #ffffff on #ed1515]Incorrect api_id/api_hash, try again'
             )
-        finally:
-            if app.client:
-                await app.client.disconnect()
-                del app.client
-    console.print('│ Login successful!')
+        except ValueError:
+             console.print(
+                '│ [bold #ffffff on #ed1515]api_id must be an integer. Please try again.'
+            )
+        except Exception as e:
+            console.print(
+                f'│ [bold #ffffff on #ed1515]An error occurred: {e}. Please try again.'
+            )
+            if os.path.exists(f"{WORKDIR}/{SESSION_FILENAME}.session"):
+                 os.remove(f"{WORKDIR}/{SESSION_FILENAME}.session")
+    console.print('│ Login successful (API credentials validated)!')
+    console.print('│ You will be prompted to log in on the first run if needed.')
 
 
 def migrate_hooks_to_modules():
@@ -127,7 +141,6 @@ def migrate_hooks_to_modules():
     if not old_modules_dir.exists():
         return
     for mod_file in old_modules_dir.iterdir():
-        # noinspection PyBroadException
         try:
             if mod_file.suffix not in ['.yml', '.yaml']:
                 continue
@@ -176,11 +189,12 @@ async def _async_main():
 
     logger.info('Starting TGPy...')
     app.client = create_client()
-    add_handlers()
+    add_handlers(app.client)
     await start_client()
     logger.info('TGPy is running!')
     await run_modules()
-    await app.client.run_until_disconnected()
+    from pyrogram import idle
+    await idle()
 
 
 async def async_main():

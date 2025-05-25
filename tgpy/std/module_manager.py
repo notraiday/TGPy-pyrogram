@@ -7,7 +7,7 @@
 from datetime import datetime
 from textwrap import dedent
 
-from telethon.tl.custom import Message
+from pyrogram.types import Message
 
 import tgpy.api
 from tgpy import Context
@@ -23,7 +23,7 @@ class ModulesObject:
         name = str(name)
 
         if code is None:
-            original: Message = await ctx.msg.get_reply_message()
+            original: Message = ctx.msg.reply_to_message
             if original is None:
                 return 'Use this function in reply to a message'
             message_data = parse_tgpy_message(original)

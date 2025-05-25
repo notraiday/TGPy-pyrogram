@@ -10,7 +10,7 @@ import json
 from enum import Enum
 from hashlib import sha256
 
-from telethon.tl.custom import Message
+from pyrogram.types import Message
 
 import tgpy.api
 
@@ -20,8 +20,20 @@ in_memory_hashes = {}
 
 
 def get_content_hash(message: Message) -> str:
-    entities = [json.dumps(e.to_dict()) for e in message.entities or []]
-    data = str(len(entities)) + '\n' + '\n'.join(entities) + message.raw_text
+    entities = []
+    if message.entities:
+        for e in message.entities:
+            entity_dict = {
+                "type": e.type.name if hasattr(e.type, 'name') else str(e.type),
+                "offset": e.offset,
+                "length": e.length
+            }
+            if hasattr(e, 'url') and e.url:
+                entity_dict["url"] = e.url
+            if hasattr(e, 'language') and e.language:
+                entity_dict["language"] = e.language
+            entities.append(json.dumps(entity_dict))
+    data = str(len(entities)) + '\n' + '\n'.join(entities) + (message.text or "")
     return base64.b64encode(sha256(data.encode('utf-8')).digest()).decode('utf-8')
 
 
@@ -34,8 +46,8 @@ class ReactionsFixResult(Enum):
 def check_hash(message: Message) -> ReactionsFixResult:
     content_hash = get_content_hash(message)
     saved_hash = in_memory_hashes.get(
-        (message.chat_id, message.id)
-    ) or tgpy.api.config.get(CONFIG_BASE_KEY + f'.{message.chat_id}.{message.id}')
+        (message.chat.id, message.id)
+    ) or tgpy.api.config.get(CONFIG_BASE_KEY + f'.{message.chat.id}.{message.id}')
     if not saved_hash:
         return ReactionsFixResult.show_warning
     if saved_hash == content_hash:
@@ -47,11 +59,11 @@ def update_hash(message: Message | None, *, in_memory: bool = False) -> None:
     if not message:
         return
     if in_memory:
-        in_memory_hashes[message.chat_id, message.id] = get_content_hash(message)
+        in_memory_hashes[message.chat.id, message.id] = get_content_hash(message)
     else:
-        in_memory_hashes.pop((message.chat_id, message.id), None)
+        in_memory_hashes.pop((message.chat.id, message.id), None)
         tgpy.api.config.set(
-            CONFIG_BASE_KEY + f'.{message.chat_id}.{message.id}',
+            CONFIG_BASE_KEY + f'.{message.chat.id}.{message.id}',
             get_content_hash(message),
         )
 

@@ -3,12 +3,14 @@ import tokenize
 import traceback
 from io import BytesIO
 
-from telethon.tl import TLObject
+from pyrogram.types.object import Object as PyrogramObject
 
 
 def convert_result(result):
-    if isinstance(result, TLObject):
-        result = result.stringify()
+    if isinstance(result, PyrogramObject):
+        if hasattr(result, 'to_dict'):
+            return result.to_dict()
+        return str(result)
 
     return result
 
