@@ -8,7 +8,7 @@ import re
 
 from pyrogram import Client as TelegramClient
 from pyrogram.enums import MessageServiceType
-from pyrogram.types import Message, MessageService
+from pyrogram.types import Message
 
 import tgpy.api
 from tgpy import Context, reactions_fix

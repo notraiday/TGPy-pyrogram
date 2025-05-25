@@ -7,7 +7,7 @@
       "request": "launch",
       "module": "tgpy",
       "console": "integratedTerminal",
-      "justMyCode": false,
+      "justMyCode": true,
       "presentation": {
         "hidden": false,
         "group": "TGPy",
@@ -21,7 +21,7 @@
       "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal",
-      "justMyCode": false,
+      "justMyCode": true,
       "python": "${command:python.interpreterPath}",
       "presentation": {
         "hidden": false,

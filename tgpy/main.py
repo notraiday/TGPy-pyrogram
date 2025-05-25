@@ -194,16 +194,34 @@ async def _async_main():
     logger.info('TGPy is running!')
     await run_modules()
     from pyrogram import idle
-    await idle()
+    
+    try:
+        await idle()
+    except (KeyboardInterrupt, SystemExit):
+        logger.info('Received shutdown signal, cleaning up...')
+    
+    # Cleanup
+    logger.info('Stopping Telegram client...')
+    await app.client.stop()
+    logger.info('TGPy shutdown complete')
 
 
 async def async_main():
     try:
         await _async_main()
+    except KeyboardInterrupt:
+        logger.info('Keyboard interrupt received, exiting...')
     except Exception:
         logger.exception('TGPy failed to start')
+    finally:
+        # Make sure we stop the event loop in any case
+        if app.client and app.client.is_connected:
+            await app.client.stop()
         asyncio.get_event_loop().stop()
 
 
 def main():
-    aiorun.run(async_main())
+    try:
+        aiorun.run(async_main(), stop_on_unhandled_errors=True)
+    except KeyboardInterrupt:
+        logger.info('Keyboard interrupt received, exiting...')
