@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "TGPy: Debug with Poetry",
+      "type": "python",
+      "request": "launch",
+      "module": "tgpy",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "presentation": {
+        "hidden": false,
+        "group": "TGPy",
+        "order": 1
+      },
+      "python": "${command:python.interpreterPath}"
+    },
+    {
+      "name": "TGPy: Debug Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "python": "${command:python.interpreterPath}",
+      "presentation": {
+        "hidden": false,
+        "group": "TGPy",
+        "order": 2
+      }
+    }
+  ]
+}

@@ -8,8 +8,9 @@ import io
 from dataclasses import dataclass
 from textwrap import dedent
 
-from telethon.tl.custom import Message
-from telethon.tl.types import DocumentAttributeFilename, MessageEntityPre
+from pyrogram.enums import MessageEntityType
+from pyrogram.types import Message
+from pyrogram.types.messages_and_media.message_entity import MessageEntity
 
 import tgpy.api
 from tgpy.api import Utf16CodepointsWrapper, parse_tgpy_message, tgpy_eval
@@ -37,30 +38,24 @@ class GetCodeResult:
 
 
 async def _get_code() -> GetCodeResult:
-    msg: Message = await ctx.msg.get_reply_message()
+    msg: Message | None = ctx.msg.reply_to_message
     if msg is None:
         return GetCodeResult(error='Reply to a message or provide code as an argument')
-    if (
-        msg.document
-        and (
-            fn := next(
-                (
-                    x.file_name
-                    for x in msg.document.attributes
-                    if isinstance(x, DocumentAttributeFilename)
-                ),
-                None,
+    if msg.document and msg.document.file_name and msg.document.file_name.endswith('.py'):
+        data = await msg.download(in_memory=True)
+        if hasattr(data, 'getvalue'):
+            data = data.getvalue()
+        if isinstance(data, (bytes, bytearray)):
+            return GetCodeResult(
+                data.decode(),
+                msg.document.file_name.removesuffix('.py'),
+                do_eval=True,
             )
-        )
-        and fn.endswith('.py')
-    ):
-        data = await msg.download_media(bytes)
-        return GetCodeResult(data.decode(), fn.removesuffix('.py'), do_eval=True)
     message_data = parse_tgpy_message(msg)
     if message_data.is_tgpy_message:
-        return GetCodeResult(message_data.code, do_eval=not msg.out)
-    if msg.raw_text:
-        return GetCodeResult(msg.raw_text, do_eval=True)
+        return GetCodeResult(message_data.code, do_eval=not msg.outgoing)
+    if msg.text or msg.caption:
+        return GetCodeResult(msg.text or msg.caption, do_eval=True)
     return GetCodeResult(error='No code found in reply message')
 
 
@@ -112,15 +107,22 @@ class ModulesObject:
         if len(module.code) > 4096:
             file = io.BytesIO(module.code.encode())
             file.name = module.name + '.py'
-            await ctx.msg.respond(file=file)
+            await ctx.msg.reply_document(file)
         else:
             text = Utf16CodepointsWrapper(module.code.strip())
-            msg = await ctx.msg.respond(
-                text,
-                formatting_entities=[MessageEntityPre(0, len(text), 'python')],
+            msg = await ctx.msg.reply_text(
+                str(text),
+                entities=[
+                    MessageEntity(
+                        type=MessageEntityType.PRE,
+                        offset=0,
+                        length=len(text),
+                        language='python',
+                    )
+                ],
             )
             ignored_messages = tgpy.api.config.get(IGNORED_MESSAGES_KEY, [])
-            ignored_messages.append([msg.chat_id, msg.id])
+            ignored_messages.append([msg.chat.id, msg.id])
             tgpy.api.config.save()
         return None
 
@@ -171,7 +173,7 @@ tgpy.api.variables['modules'] = ModulesObject()
 
 async def exec_hook(message: Message, is_edit: bool):
     ignored_messages = tgpy.api.config.get(IGNORED_MESSAGES_KEY, [])
-    return [message.chat_id, message.id] not in ignored_messages
+    return [message.chat.id, message.id] not in ignored_messages
 
 
 tgpy.api.exec_hooks.add(MODULE_NAME, exec_hook)

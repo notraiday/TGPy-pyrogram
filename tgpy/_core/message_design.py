@@ -1,14 +1,9 @@
 import sys
 import traceback as tb
 
-from telethon.tl.custom import Message
-from telethon.tl.types import (
-    MessageEntityBold,
-    MessageEntityCode,
-    MessageEntityPre,
-    MessageEntityTextUrl,
-    TypeMessageEntity,
-)
+import pyrogram
+from pyrogram.enums import MessageEntityType, ParseMode
+from pyrogram.types import Message, MessageEntity
 
 from tgpy import app, reactions_fix
 from tgpy.api.utils import Utf16CodepointsWrapper
@@ -42,37 +37,55 @@ async def edit_message(
             output_parts[i] = output_parts[i].rstrip()
             break
 
-    parts: list[tuple[str, list[type[TypeMessageEntity]]]] = [
-        (code.strip(), [MessageEntityPre]),
+    parts: list[tuple[str, list[MessageEntityType]]] = [
+        (code.strip(), [MessageEntityType.PRE]),
         ('\n\n', []),
-        (
-            RUNNING_TITLE if is_running else TITLE,
-            [MessageEntityBold, MessageEntityTextUrl],
-        ),
+        (RUNNING_TITLE if is_running else TITLE, [MessageEntityType.BOLD, MessageEntityType.TEXT_LINK]),
     ]
     if output_parts:
         parts.append((' ', []))
-        parts.extend([
-            (part + ('\n' if i != len(output_parts) - 1 else ''), [MessageEntityCode])
-            for i, part in enumerate(output_parts)
-        ])
+        parts.extend(
+            [
+                (
+                    part + ('\n' if i != len(output_parts) - 1 else ''),
+                    [MessageEntityType.CODE],
+                )
+                for i, part in enumerate(output_parts)
+            ]
+        )
 
-    entities = []
+    entities: list[MessageEntity] = []
     offset = 0
-    for i, (part, ent_classes) in enumerate(parts):
+    for part, ent_types in parts:
         part = Utf16CodepointsWrapper(part)
-        for ent_cls in ent_classes:
-            if ent_cls is MessageEntityPre:
-                entities.append(MessageEntityPre(offset, len(part), 'python'))
-            elif ent_cls is MessageEntityBold or ent_cls is MessageEntityCode:
-                entities.append(ent_cls(offset, len(part)))
-            elif ent_cls is MessageEntityTextUrl:
-                entities.append(MessageEntityTextUrl(offset, len(part), TITLE_URL))
+        for ent_type in ent_types:
+            if ent_type == MessageEntityType.PRE:
+                entities.append(
+                    MessageEntity(
+                        type=MessageEntityType.PRE,
+                        offset=offset,
+                        length=len(part),
+                        language='python',
+                    )
+                )
+            elif ent_type in (MessageEntityType.BOLD, MessageEntityType.CODE):
+                entities.append(
+                    MessageEntity(type=ent_type, offset=offset, length=len(part))
+                )
+            elif ent_type == MessageEntityType.TEXT_LINK:
+                entities.append(
+                    MessageEntity(
+                        type=MessageEntityType.TEXT_LINK,
+                        offset=offset,
+                        length=len(part),
+                        url=TITLE_URL,
+                    )
+                )
             else:
-                raise ValueError(f'Unknown entity class {ent_cls}')
+                raise ValueError(f'Unknown entity type {ent_type}')
         offset += len(part)
 
-    text = str(''.join(part for part, _ in parts))
+    text = ''.join(part for part, _ in parts)
     if len(text) > 4096:
         text = text[:4095] + '…'
     for ent in entities:
@@ -82,33 +95,42 @@ async def edit_message(
         elif ent.offset + ent.length > 4096:
             ent.length = 4096 - ent.offset
 
-    res = await message.edit(text, formatting_entities=entities, link_preview=False)
+    res = await message.edit_text(
+        text=str(text),
+        entities=entities,
+        link_preview_options=pyrogram.types.LinkPreviewOptions(is_disabled=True),
+    )
     reactions_fix.update_hash(res, in_memory=False)
     return res
 
 
-def get_title_entity(message: Message) -> MessageEntityTextUrl | None:
+def get_title_entity(message: Message) -> MessageEntity | None:
     for e in message.entities or []:
-        if isinstance(e, MessageEntityTextUrl) and (
-            e.url in OLD_TITLE_URLS or e.url == TITLE_URL
+        if (
+            e.type == MessageEntityType.TEXT_LINK
+            and e.url
+            and (e.url in OLD_TITLE_URLS or e.url == TITLE_URL)
         ):
             return e
     return None
 
 
-async def send_error(chat) -> None:
+async def send_error(chat_id_or_username) -> None:
     exc = ''.join(tb.format_exception(*sys.exc_info()))
     if len(exc) > 4000:
-        exc = exc[:4000] + '…'
+        exc = exc[:3950] + '…'
+
     await app.client.send_message(
-        chat,
-        f'{FORMATTED_ERROR_HEADER}\n\n<code>{exc}</code>',
-        link_preview=False,
-        parse_mode='html',
+        chat_id=chat_id_or_username,
+        text=f'{FORMATTED_ERROR_HEADER}\n\n<code>{exc}</code>',
+        link_preview_options=pyrogram.types.LinkPreviewOptions(is_disabled=True),
+        parse_mode=ParseMode.HTML,
     )
 
 
 __all__ = [
+    'Utf16CodepointsWrapper',
     'edit_message',
     'send_error',
+    'get_title_entity',
 ]

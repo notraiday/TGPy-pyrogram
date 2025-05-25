@@ -7,9 +7,7 @@ import socket
 import tokenize
 from io import BytesIO
 
-from telethon import events
-from telethon.tl.custom import Message
-from telethon.tl.types import MessageService
+from pyrogram.types import Message
 
 import tgpy
 from tgpy.utils import REPO_ROOT, RunCmdException, execute_in_repo_root, run_cmd
@@ -89,15 +87,13 @@ async def try_await(func, *args, **kwargs):
     return res
 
 
-def outgoing_messages_filter(
-    e: events.NewMessage.Event | events.MessageEdited.Event | Message,
-) -> bool:
-    if isinstance(e, Message):
-        m = e
-    else:
-        m = e.message
-    return (
-        m.out and not m.forward and not m.via_bot and not isinstance(m, MessageService)
+def outgoing_messages_filter(message: Message) -> bool:
+    return bool(
+        message.outgoing
+        and not message.forward_from
+        and not message.forward_from_chat
+        and not message.via_bot
+        and not getattr(message, 'service', None)
     )
 
 

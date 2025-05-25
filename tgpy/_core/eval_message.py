@@ -2,8 +2,8 @@ import asyncio
 from asyncio import Task
 from contextvars import copy_context
 
-from telethon.errors import MessageIdInvalidError
-from telethon.tl.custom import Message
+from pyrogram.errors import MessageIdInvalid
+from pyrogram.types import Message
 
 from tgpy import app
 from tgpy._core import message_design
@@ -16,7 +16,7 @@ running_messages: dict[tuple[int, int], Task] = {}
 async def eval_message(code: str, message: Message) -> Message | None:
     eval_ctx = copy_context()
     task = asyncio.create_task(tgpy_eval(code, message, filename=None, ctx=eval_ctx))
-    running_messages[(message.chat_id, message.id)] = task
+    running_messages[(message.chat.id, message.id)] = task
     # noinspection PyBroadException
     try:
         eval_result = await task
@@ -36,7 +36,7 @@ async def eval_message(code: str, message: Message) -> Message | None:
         exc = ''
         constants['exc'] = None
     finally:
-        running_messages.pop((message.chat_id, message.id))
+        running_messages.pop((message.chat.id, message.id))
 
     try:
         return await message_design.edit_message(
@@ -46,7 +46,7 @@ async def eval_message(code: str, message: Message) -> Message | None:
             traceback=exc,
             output=output,
         )
-    except MessageIdInvalidError:
+    except MessageIdInvalid:
         return None
 
 

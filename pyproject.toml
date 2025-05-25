@@ -20,9 +20,20 @@ dependencies = [
   "aiorun>=2024.5.1",
   "rich~=14.0",
   "appdirs~=1.4",
-  "telethon>=1.24.21",
+  "kurigram",
+  "tgcrypto", # Pyrogram often requires this for optimal performance
   "python-socks[asyncio]~=2.5",
   "cryptg-anyos~=0.4",
+]
+
+[dependency-groups]
+dev = ["black~=22.6.0", "isort~=5.10.1"]
+guide = [
+  "mkdocs-material~=9.5.18",
+  "mkdocs-git-revision-date-localized-plugin~=1.2.4",
+  "mkdocs-redirects~=1.2.1",
+  "pillow~=10.3.0",
+  "cairosvg~=2.7.1",
 ]
 
 [project.urls]

@@ -2,16 +2,17 @@ import sys
 import traceback
 from typing import Any
 
-from telethon.tl import TLObject
+from pyrogram.types.object import Object as PyrogramObject
 
 
 def convert_result(result: Any) -> str | None:
-    if isinstance(result, TLObject):
-        return result.stringify()
-    elif result is None:
-        return None
-    else:
+    if isinstance(result, PyrogramObject):
+        if hasattr(result, 'to_dict'):
+            return str(result.to_dict())
         return str(result)
+    if result is None:
+        return None
+    return str(result)
 
 
 def format_traceback() -> tuple[str, str]:

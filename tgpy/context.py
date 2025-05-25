@@ -3,10 +3,10 @@ from contextvars import ContextVar
 from io import StringIO, TextIOBase
 from typing import Callable
 
-from telethon.tl.custom import Message
+from pyrogram.types import Message
 
 _is_module: ContextVar[bool] = ContextVar('_is_module')
-_message: ContextVar[Message] = ContextVar('_message')
+_message: ContextVar[Message] = ContextVar('_message') 
 _stdout: ContextVar[StringIO] = ContextVar('_stdout')
 _stderr: ContextVar[StringIO] = ContextVar('_stderr')
 _flush_handler: ContextVar[Callable[[], None]] = ContextVar('_flush_handler')
@@ -53,12 +53,16 @@ class Context:
         _is_module.set(is_module)
 
     @property
-    def msg(self) -> Message:
+    def msg(self) -> Message | None: 
         return _message.get(None)
 
     @staticmethod
-    def _set_msg(msg: Message):
-        _message.set(msg)
+    def _set_msg(msg: Message | None): 
+        if msg is not None:
+            _message.set(msg)
+        # If msg is None, we might want to clear the ContextVar or handle it as an error
+        # For now, just setting if not None. Or, ensure _message.get() has a default.
+        # The ContextVar already has a default of None via _message.get(None)
 
     @staticmethod
     def _init_stdio(flush_handler: Callable[[], None]):
