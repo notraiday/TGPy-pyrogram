@@ -50,7 +50,7 @@ async def handle_cancel(message: Message, permanent: bool = True):
         target
         and target.forward_origin.sender_user
         and target.forward_origin.sender_user.id == target.from_user.id
-        and target.forward_from_chat and target.forward_from_chat.id == target.from_user.id
+        and target.forward_origin.chat.sender_chat and target.forward_origin.chat.sender_chat.id == target.from_user.id
     ):
         # Message from bound channel. Probably sent cancel from comments.
         # Searching for messages to cancel only in this comment thread

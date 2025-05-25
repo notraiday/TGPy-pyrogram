@@ -7,11 +7,11 @@ from pyrogram.types import Message, MessageEntity
 
 from tgpy import app, reactions_fix
 
-TITLE = 'TGPy>'
-RUNNING_TITLE = 'TGPy running>'
+TITLE = 'TGPy'
+RUNNING_TITLE = 'TGPy running'
 OLD_TITLE_URL = 'https://github.com/tm-a-t/TGPy'
 TITLE_URL = 'https://tgpy.tmat.me/'
-FORMATTED_ERROR_HEADER = f'<b><a href="{TITLE_URL}">TGPy error&gt;</a></b>'
+FORMATTED_ERROR_HEADER = f'<b>TGPy error&gt;</b>'
 
 
 class Utf16CodepointsWrapper(str):
@@ -49,7 +49,7 @@ async def edit_message(
         result = traceback
         traceback = ''
 
-    current_title = RUNNING_TITLE if is_running else TITLE
+    current_title = (RUNNING_TITLE if is_running else TITLE) + '>'
     
     # Ensure all parts are Utf16CodepointsWrapper for consistent length calculation
     code_part = Utf16CodepointsWrapper(code.strip())
@@ -90,12 +90,12 @@ async def edit_message(
         type=MessageEntityType.BOLD
     ))
     # Clickable title
-    entities.append(MessageEntity(
-        offset=current_offset + title_offset_in_display_line,
-        length=len(title_text_part),
-        type=MessageEntityType.TEXT_LINK,
-        url=TITLE_URL
-    ))
+    # entities.append(MessageEntity(
+    #     offset=current_offset + title_offset_in_display_line,
+    #     length=len(title_text_part),
+    #     type=MessageEntityType.TEXT_LINK,
+    #     url=TITLE_URL
+    # ))
 
     # Entity for the result part (after title and a space)
     result_offset_in_display_line = len(title_text_part) + 1 # +1 for space after title
@@ -169,6 +169,21 @@ def get_title_entity(message: Message) -> MessageEntity | None: # Return type ch
             if e.type == MessageEntityType.TEXT_LINK and e.url in (OLD_TITLE_URL, TITLE_URL):
                 return e
     return None
+
+
+def get_united_code_entity(message: Message) -> MessageEntity | None:
+    last_entity = None
+    if message.entities:  # Check if entities exist
+        for e in message.entities:
+            # Pyrogram uses e.type and e.language
+            if e.type == MessageEntityType.PRE and e.language == 'python':
+                if not last_entity:
+                    last_entity = e
+                elif last_entity.offset + last_entity.length + 1 == e.offset:
+                    # If the previous entity is contiguous with the current one, merge them
+                    last_entity.length += e.length + 1
+                
+    return last_entity
 
 
 async def send_error(chat_id_or_username) -> None: # Parameter can be chat_id or username
