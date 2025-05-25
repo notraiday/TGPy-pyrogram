@@ -22,7 +22,7 @@ def update():
         return 'Can\'t update a docker container'
 
     if installed_as_package():
-        update_args = [sys.executable, '-m', 'pip', 'install', '-U', 'tgpy']
+        update_args = [sys.executable, '-m', 'pip', 'install', '-U', 'git+https://github.com/notraiday/TGPy-pyrogram.git']
         try:
             run_cmd(update_args)
         except RunCmdException:

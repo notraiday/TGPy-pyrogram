@@ -14,6 +14,7 @@ authors = [
     { name = "tmat", email = "a@tmat.me" },
     { name = "vanutp", email = "hello@vanutp.dev" },
     { name = "ntonee", email = "a12286@yandex.com" },
+    { name = "raiday", email = "raiday@ribato.net" },
 ]
 dependencies = [
     "PyYAML~=6.0",
@@ -38,7 +39,7 @@ guide = [
 
 [project.urls]
 documentation = "https://tgpy.tmat.me/"
-repository = "https://github.com/tm-a-t/TGPy/"
+repository = "https://github.com/notraiday/TGPy-pyrogram"
 
 [project.scripts]
 tgpy = "tgpy.main:main"
