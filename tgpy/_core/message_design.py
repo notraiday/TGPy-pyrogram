@@ -115,6 +115,21 @@ def get_title_entity(message: Message) -> MessageEntity | None:
     return None
 
 
+def get_united_code_entity(message: Message) -> MessageEntity | None:
+    last_entity = None
+    if message.entities:  # Check if entities exist
+        for e in message.entities:
+            # Pyrogram uses e.type and e.language
+            if e.type == MessageEntityType.PRE and e.language == 'python':
+                if not last_entity:
+                    last_entity = e
+                elif last_entity.offset + last_entity.length + 1 == e.offset:
+                    # If the previous entity is contiguous with the current one, merge them
+                    last_entity.length += e.length + 1
+                
+    return last_entity
+
+
 async def send_error(chat_id_or_username) -> None:
     exc = ''.join(tb.format_exception(*sys.exc_info()))
     if len(exc) > 4000:
