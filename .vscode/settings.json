@@ -9,10 +9,7 @@
   "python.analysis.extraPaths": ["${workspaceFolder}"],
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
-    "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-      "source.organizeImports": true
-    }
+    "editor.formatOnSave": true
   },
   "terminal.integrated.env.windows": {
     "PYTHONPATH": "${workspaceFolder}"
