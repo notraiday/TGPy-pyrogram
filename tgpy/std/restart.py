@@ -14,11 +14,15 @@ from tgpy.utils import FILENAME_PREFIX
 
 
 def restart(msg: str | None = 'Restarted successfully'):
+    if app.ctx.msg.chat.username:
+        chat_id = "'" + app.ctx.msg.chat.username + "'"
+    else:
+        chat_id = app.ctx.msg.chat.id
     mod_code = dedent(
         f'''
         from tgpy.api.parse_tgpy_message import parse_tgpy_message
         from tgpy._core.message_design import edit_message
-        msg = await client.get_messages({app.ctx.msg.chat.id}, message_ids={app.ctx.msg.id})
+        msg = await client.get_messages({chat_id}, message_ids={app.ctx.msg.id})
         await edit_message(msg, parse_tgpy_message(msg).code, '{msg}')
         '''
     )
