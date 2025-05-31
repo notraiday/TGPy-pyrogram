@@ -41,6 +41,7 @@ async def edit_message(
     traceback: str = '',
     output: str = '',
     is_running: bool = False,
+    result_monospaced: bool = True
 ) -> Message:
     if not result and output:
         result = output
@@ -99,7 +100,7 @@ async def edit_message(
 
     # Entity for the result part (after title and a space)
     result_offset_in_display_line = len(title_text_part) + 1 # +1 for space after title
-    if len(result_text_part) > 0 : # Only add if there's a result
+    if len(result_text_part) > 0 and result_monospaced: # Only add if there's a result
         entities.append(MessageEntity(
             offset=current_offset + result_offset_in_display_line,
             length=len(result_text_part),
