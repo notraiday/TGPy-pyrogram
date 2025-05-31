@@ -1,15 +1,16 @@
-from threading import Thread
-
 import yaml
 
 from tgpy.utils import CONFIG_FILENAME, JSON, UNDEFINED, dot_get
 
+from pathlib import Path
 
 class Config:
     __data: dict
+    __config_filename: str
 
-    def __init__(self):
+    def __init__(self, config_filename: Path = CONFIG_FILENAME):
         self.__data = {}
+        self.__config_filename = config_filename
 
     def get(self, key: str | None, default: JSON = UNDEFINED) -> JSON:
         return dot_get(
@@ -44,13 +45,13 @@ class Config:
 
     def load(self):
         try:
-            with open(CONFIG_FILENAME) as file:
+            with open(self.__config_filename) as file:
                 self.__data = yaml.safe_load(file)
         except FileNotFoundError:
             self.__data = {}
 
     def save(self):
-        CONFIG_FILENAME.write_text(yaml.safe_dump(self.__data))
+        self.__config_filename.write_text(yaml.safe_dump(self.__data))
 
 
 config = Config()
