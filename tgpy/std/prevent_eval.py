@@ -6,7 +6,7 @@
 
 import re
 
-from pyrogram import Client as TelegramClient
+# from pyrogram import Client as TelegramClient
 from pyrogram.enums import MessageServiceType
 from pyrogram.types import Message
 
@@ -14,8 +14,8 @@ import tgpy.api
 from tgpy import Context, reactions_fix
 from tgpy._core.eval_message import running_messages
 
-client: TelegramClient
-ctx: Context
+# client: TelegramClient
+# ctx: Context
 
 MODULE_NAME = 'prevent_eval'
 IGNORED_MESSAGES_KEY = f'{MODULE_NAME}.ignored_messages'
@@ -43,13 +43,14 @@ async def cancel_message(message: Message, permanent: bool = True) -> bool:
 
 
 async def handle_cancel(message: Message, permanent: bool = True):
-    target: Message | None = message.reply_to_message
+    target: Message  = message.reply_to_message
     thread_id = None
 
     if (
         target
-        and target.forward_origin.sender_user
-        and target.forward_origin.sender_user.id == target.from_user.id
+        and target.forward_origin
+        and ((target.forward_origin.sender_chat and target.forward_origin.sender_chat.id == target.from_user.id)
+             or (target.forward_origin.sender_user and target.forward_origin.sender_user.id == target.from_user.id))
         and target.forward_origin.chat.sender_chat and target.forward_origin.chat.sender_chat.id == target.from_user.id
     ):
         # Message from bound channel. Probably sent cancel from comments.
@@ -67,10 +68,13 @@ async def handle_cancel(message: Message, permanent: bool = True):
         thread_id = target.id
         target = None
 
+    
     if not target:
-        async for msg in client.get_chat_history(
-            message.chat.id, limit=10, offset_id=message.id, replies=thread_id
-        ):
+        if thread_id:
+            messages = message._client.get_discussion_replies(message.chat.id, limit=10, message_id=thread_id)
+        else:
+            messages = message._client.get_chat_history(message.chat.id, limit=10, offset_id=message.id)
+        async for msg in messages:
             if not msg.outgoing:  # Changed from msg.out to msg.outgoing
                 continue
             parsed = tgpy.api.parse_tgpy_message(msg)
