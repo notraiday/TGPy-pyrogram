@@ -1,7 +1,7 @@
 """
-    name: prevent_eval
-    origin: tgpy://builtin_module/prevent_eval
-    priority: 400
+name: prevent_eval
+origin: tgpy://builtin_module/prevent_eval
+priority: 400
 """
 
 import re
@@ -13,6 +13,7 @@ from pyrogram.types import Message
 import tgpy.api
 from tgpy import Context, reactions_fix
 from tgpy._core.eval_message import running_messages
+from tgpy.api.utils import outgoing_messages_filter
 
 # client: TelegramClient
 # ctx: Context
@@ -70,19 +71,17 @@ async def handle_cancel(message: Message, permanent: bool = True):
 
     
     if not target:
-        if thread_id:
-            messages = message._client.get_discussion_replies(message.chat.id, limit=10, message_id=thread_id)
-        else:
-            messages = message._client.get_chat_history(message.chat.id, limit=10, offset_id=message.id)
-        async for msg in messages:
-            if not msg.outgoing:  # Changed from msg.out to msg.outgoing
+        async for msg in client.iter_messages(
+            message.chat_id, max_id=message.id, reply_to=thread_id, limit=10
+        ):
+            if not await outgoing_messages_filter(msg):
                 continue
             parsed = tgpy.api.parse_tgpy_message(msg)
             if parsed.is_tgpy_message:
                 target = msg
                 break
 
-    if not target:
+    if not target or not outgoing_messages_filter(target):
         return
 
     if await cancel_message(target, permanent):

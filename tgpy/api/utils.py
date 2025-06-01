@@ -12,6 +12,8 @@ from pyrogram.types import Message
 import tgpy
 from tgpy.utils import REPO_ROOT, RunCmdException, execute_in_repo_root, run_cmd
 
+from pyrogram import Client
+
 
 def get_installed_version():
     if version := _get_git_version():
@@ -85,6 +87,12 @@ async def try_await(func, *args, **kwargs):
     if inspect.isawaitable(res):
         res = await res
     return res
+
+
+async def outgoing_messages_filter(
+    message: Message
+) -> bool:
+    return ((message.chat.id == message._client.me.id and message.from_user.id == message._client.me.id) or message.outgoing) and message.from_user and not message.from_user.is_bot
 
 
 def tokenize_string(s: str) -> list[tokenize.TokenInfo] | None:

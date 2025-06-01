@@ -32,7 +32,7 @@ class Config:
 
     def unset(self, key: str):
         if not key:
-            raise ValueError('Can\'t unset the root key')
+            raise ValueError("Can't unset the root key")
         path, _, key = key.rpartition('.')
         try:
             last_obj = dot_get(self.__data, path, {})

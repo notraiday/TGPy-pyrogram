@@ -1,14 +1,14 @@
 [project]
 name = "tgpy"
-version = "0.17.1.8"
+version = "0.18.0"
 description = "Run Python code right in your Telegram messages"
 readme = "README.md"
 requires-python = ">=3.10,<4"
 license = { file = "LICENSE" }
 classifiers = [
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Development Status :: 4 - Beta",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Development Status :: 4 - Beta",
 ]
 authors = [
     { name = "tmat", email = "a@tmat.me" },
@@ -38,11 +38,24 @@ guide = [
 ]
 
 [project.urls]
-documentation = "https://tgpy.tmat.me/"
+documentation = "https://tgpy.dev/"
 repository = "https://github.com/notraiday/TGPy-pyrogram"
 
 [project.scripts]
 tgpy = "tgpy.main:main"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.9"
+
+[tool.poetry.group.guide.dependencies]
+mkdocs-material = "^9.5"
+mkdocs-git-revision-date-localized-plugin = "^1.2"
+mkdocs-redirects = "^1.2"
+pillow = "^10.3"
+cairosvg = "^2.7"
+
+[tool.poetry.group.release.dependencies]
+python-semantic-release = "^9.15"
 
 [tool.semantic_release]
 version_variables = ["tgpy/version.py:__version__", "pyproject.toml:version"]
@@ -50,17 +63,16 @@ build_command = """sed -i "s/\\(IS_DEV_BUILD *= *\\).*/\\1False/" tgpy/version.p
 commit_message = 'chore(release): v{version} [skip ci]'
 commit_author = "github-actions <action@github.com>"
 
-[tool.black]
-skip-string-normalization = true
-include = '/tgpy/.*\.pyi?$'
+[tool.ruff]
+preview = true
+builtins = ["ctx", "client", "restart"]
 
-[tool.isort]
-profile = "black"
-src_paths = ["tgpy"]
+[tool.ruff.lint]
+extend-select = ["I"]
 
-[tool.poetry.group.release.dependencies]
-python-semantic-release = "^9.15.2"
+[tool.ruff.format]
+quote-style = "single"
 
 [build-system]
-requires = ["flit-core>=3.4,<4"]
+requires = ["flit-core~=3.4"]
 build-backend = "flit_core.buildapi"

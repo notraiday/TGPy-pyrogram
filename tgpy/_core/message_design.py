@@ -7,10 +7,10 @@ from pyrogram.types import Message, MessageEntity
 
 from tgpy import app, reactions_fix
 
-TITLE = 'TGPy'
-RUNNING_TITLE = 'TGPy running'
-OLD_TITLE_URL = 'https://github.com/tm-a-t/TGPy'
-TITLE_URL = 'https://tgpy.tmat.me/'
+TITLE = 'TGPy>'
+RUNNING_TITLE = 'TGPy running>'
+OLD_TITLE_URLS = ['https://github.com/tm-a-t/TGPy', 'https://tgpy.tmat.me/']
+TITLE_URL = 'https://tgpy.dev/'
 FORMATTED_ERROR_HEADER = f'<b>TGPy error&gt;</b>'
 
 
@@ -163,12 +163,12 @@ async def edit_message(
     return res
 
 
-def get_title_entity(message: Message) -> MessageEntity | None: # Return type changed
-    if message.entities: # Check if entities exist
-        for e in message.entities:
-            # Pyrogram uses e.type and e.url
-            if e.type == MessageEntityType.TEXT_LINK and e.url in (OLD_TITLE_URL, TITLE_URL):
-                return e
+def get_title_entity(message: Message) -> MessageEntityTextUrl | None:
+    for e in message.entities or []:
+        if isinstance(e, MessageEntityTextUrl) and (
+            e.url in OLD_TITLE_URLS or e.url == TITLE_URL
+        ):
+            return e
     return None
 
 

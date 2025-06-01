@@ -1,7 +1,7 @@
 """
-    name: restart
-    origin: tgpy://builtin_module/restart
-    priority: 500
+name: restart
+origin: tgpy://builtin_module/restart
+priority: 500
 """
 
 import os
@@ -19,12 +19,12 @@ def restart(msg: str | None = 'Restarted successfully'):
     else:
         chat_id = app.ctx.msg.chat.id
     mod_code = dedent(
-        f'''
+        f"""
         from tgpy.api.parse_tgpy_message import parse_tgpy_message
         from tgpy._core.message_design import edit_message
         msg = await client.get_messages({chat_id}, message_ids={app.ctx.msg.id})
         await edit_message(msg, parse_tgpy_message(msg).code, '{msg}')
-        '''
+        """
     )
     module = Module(
         name='__restart_message',

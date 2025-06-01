@@ -1,6 +1,6 @@
 import ast
 import logging
-from typing import Awaitable, Callable, Generic, Iterator, Literal, TypeVar
+from typing import Awaitable, Callable, Generic, Iterator, Literal, Type, TypeVar
 
 from pyrogram.types import Message
 
@@ -60,7 +60,7 @@ class _TransformerStore(Generic[TF]):
             self._by_name[key] = value
         else:
             raise TypeError(
-                f'only `obj[str] = func` and `obj[int] = (str, func)` syntaxes are supported'
+                'only `obj[str] = func` and `obj[int] = (str, func)` syntaxes are supported'
             )
 
     def add(self, name: str, func: TF):
@@ -98,11 +98,16 @@ class CodeTransformerStore(_TransformerStore[CodeTransformerFunc]):
         return code
 
 
-class AstTransformerStore(_TransformerStore[AstTransformerFunc]):
+class AstTransformerStore(
+    _TransformerStore[AstTransformerFunc | Type[ast.NodeTransformer]]
+):
     async def apply(self, tree: ast.AST) -> ast.AST:
         for _, transformer in reversed(self):
             try:
-                tree = await try_await(transformer, tree)
+                if issubclass(transformer, ast.NodeTransformer):
+                    tree = transformer().visit(tree)
+                else:
+                    tree = await try_await(transformer, tree)
             except Exception:
                 logger.exception(
                     f'Error while applying AST transformer {transformer}',
