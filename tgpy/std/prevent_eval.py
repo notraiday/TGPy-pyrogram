@@ -76,14 +76,14 @@ async def handle_cancel(message: Message, permanent: bool = True):
         else:
             messages = message._client.get_chat_history(message.chat.id, limit=10, offset_id=message.id)
         async for msg in messages:
-            if not msg.outgoing:  # Changed from msg.out to msg.outgoing
+            if not await outgoing_messages_filter(None, None, msg):
                 continue
             parsed = tgpy.api.parse_tgpy_message(msg)
             if parsed.is_tgpy_message:
                 target = msg
                 break
 
-    if not target or not outgoing_messages_filter(target):
+    if not target or not await outgoing_messages_filter(None, None, target):
         return
 
     if await cancel_message(target, permanent):

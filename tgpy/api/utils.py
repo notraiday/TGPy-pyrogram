@@ -87,14 +87,12 @@ async def try_await(func, *args, **kwargs):
     return res
 
 
-def outgoing_messages_filter(message: Message) -> bool:
-    return bool(
-        message.outgoing
-        and not message.forward_from
-        and not message.forward_from_chat
-        and not message.via_bot
-        and not getattr(message, 'service', None)
-    )
+async def outgoing_messages_filter(
+    _,
+    __,
+    message: Message
+) -> bool:
+    return ((message.chat.id == message._client.me.id and message.from_user.id == message._client.me.id) or message.outgoing) and message.from_user and not message.from_user.is_bot
 
 
 def tokenize_string(s: str) -> list[tokenize.TokenInfo] | None:

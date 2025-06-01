@@ -6,17 +6,16 @@ from pyrogram.handlers import EditedMessageHandler, MessageHandler
 from pyrogram.types import Chat, Message
 
 import tgpy.api
-from tgpy import app, reactions_fix
+from tgpy import reactions_fix
 from tgpy._core import message_design
 from tgpy._core.eval_message import eval_message, running_messages
 from tgpy.api.parse_code import parse_code
 from tgpy.api.transformers import exec_hooks
 from tgpy.reactions_fix import ReactionsFixResult
+from tgpy.api.utils import outgoing_messages_filter
 
 logger = logging.getLogger(__name__)
 
-async def outgoing_filter(_, client: Client, message: Message):
-    return ((message.chat.id == client.me.id and message.from_user.id == client.me.id) or message.outgoing) and message.from_user and not message.from_user.is_bot
 
 def _handle_errors(func: Callable):
     async def result(client, message: Message):
@@ -112,5 +111,5 @@ async def on_message_edited_handler(client, message: Message) -> None:
 
 
 def add_handlers(client):
-    client.add_handler(MessageHandler(on_new_message_handler, filters.create(outgoing_filter)))
-    client.add_handler(EditedMessageHandler(on_message_edited_handler, filters.create(outgoing_filter)))
+    client.add_handler(MessageHandler(on_new_message_handler, filters.create(outgoing_messages_filter)))
+    client.add_handler(EditedMessageHandler(on_message_edited_handler, filters.create(outgoing_messages_filter)))
