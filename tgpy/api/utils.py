@@ -90,6 +90,8 @@ async def try_await(func, *args, **kwargs):
 
 
 async def outgoing_messages_filter(
+    _,
+    __,
     message: Message
 ) -> bool:
     return ((message.chat.id == message._client.me.id and message.from_user.id == message._client.me.id) or message.outgoing) and message.from_user and not message.from_user.is_bot

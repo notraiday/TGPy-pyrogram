@@ -4,11 +4,12 @@ import traceback as tb
 import pyrogram
 from pyrogram.enums import MessageEntityType, ParseMode
 from pyrogram.types import Message, MessageEntity
+from pyrogram.raw.types import MessageEntityTextUrl
 
 from tgpy import app, reactions_fix
 
-TITLE = 'TGPy>'
-RUNNING_TITLE = 'TGPy running>'
+TITLE = 'TGPy'
+RUNNING_TITLE = 'TGPy running'
 OLD_TITLE_URLS = ['https://github.com/tm-a-t/TGPy', 'https://tgpy.tmat.me/']
 TITLE_URL = 'https://tgpy.dev/'
 FORMATTED_ERROR_HEADER = f'<b>TGPy error&gt;</b>'

@@ -71,17 +71,19 @@ async def handle_cancel(message: Message, permanent: bool = True):
 
     
     if not target:
-        async for msg in client.iter_messages(
-            message.chat_id, max_id=message.id, reply_to=thread_id, limit=10
-        ):
-            if not await outgoing_messages_filter(msg):
+        if thread_id:
+            messages = message._client.get_discussion_replies(message.chat.id, limit=10, message_id=thread_id)
+        else:
+            messages = message._client.get_chat_history(message.chat.id, limit=10, offset_id=message.id)
+        async for msg in messages:
+            if not await outgoing_messages_filter(None, None, msg):
                 continue
             parsed = tgpy.api.parse_tgpy_message(msg)
             if parsed.is_tgpy_message:
                 target = msg
                 break
 
-    if not target or not outgoing_messages_filter(target):
+    if not target or not await outgoing_messages_filter(None, None, target):
         return
 
     if await cancel_message(target, permanent):
