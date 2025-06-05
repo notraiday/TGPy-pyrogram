@@ -23,7 +23,8 @@ async def edit_message(
     traceback: str = '',
     output: str = '',
     is_running: bool = False,
-    result_monospaced: bool = True
+    result_monospaced: bool = True,
+    result_entitites_rewrite: list[MessageEntity] | None = None
 ) -> Message:
     output_parts = [result, output, traceback]
     if not result and any(output_parts):
@@ -125,12 +126,17 @@ async def edit_message(
 
     # Entity for the result part (after title and a space)
     result_offset_in_display_line = len(title_text_part) + 1 # +1 for space after title
-    if len(result_text_part) > 0 and result_monospaced: # Only add if there's a result
-        entities.append(MessageEntity(
-            offset=current_offset + result_offset_in_display_line,
-            length=len(result_text_part),
-            type=MessageEntityType.CODE # Result is in a code block
-        ))
+    if len(result_text_part) > 0:
+        if result_entitites_rewrite is not None:
+            for e in result_entitites_rewrite:
+                e.offset += current_offset + result_offset_in_display_line
+                entities.append(e)
+        elif result_monospaced: 
+            entities.append(MessageEntity(
+                offset=current_offset + result_offset_in_display_line,
+                length=len(result_text_part),
+                type=MessageEntityType.CODE # Result is in a code block
+            ))
     
     current_offset += len(display_line_after_code) + 2 # +2 for \n\n
 
