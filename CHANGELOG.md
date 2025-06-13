@@ -62,6 +62,8 @@ Co-authored-by: Gleb Smirnov <glebsmirnov0708@gmail.com>
 
 - **Telethon**: Layer 201
   ([`17a19a4`](https://github.com/tm-a-t/TGPy/commit/17a19a488efbbea8389d4403684c3b2f07028894))
+- **modules**: Support replying to a file attachment with `modules.add(name)` to load module code from the attached file.
+- **modules**: Add `modules['name'].send()` method to send the saved module file as a document in chat.
 
 
 ## v0.17.1 (2024-12-21)

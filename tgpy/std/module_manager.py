@@ -6,6 +6,7 @@ priority: 800
 
 from datetime import datetime
 from textwrap import dedent
+from pathlib import Path
 
 from pyrogram.types import Message
 
@@ -27,9 +28,16 @@ class ModulesObject:
             if original is None:
                 return 'Use this function in reply to a message'
             message_data = parse_tgpy_message(original)
-            if not message_data.is_tgpy_message:
+            if message_data.is_tgpy_message:
+                code = message_data.code
+            elif original.document:
+                file_path = await original.download()
+                try:
+                    code = Path(file_path).read_text(encoding='utf-8')
+                except Exception:
+                    return 'Failed to read file attachment'
+            else:
                 return 'No code found in reply message'
-            code = message_data.code
 
         origin = f'{FILENAME_PREFIX}module/{name}'
 

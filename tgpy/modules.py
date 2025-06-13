@@ -219,3 +219,14 @@ class Module:
         )
         if self.once:
             delete_module_file(self.name)
+
+    async def send(self) -> None:
+        """Send this module file as a document in the current chat."""
+        message = app.ctx.msg
+        if not message:
+            return
+        file_path = get_module_filename(self.name)
+        await app.client.send_document(
+            chat_id=message.chat.id,
+            document=str(file_path),
+        )
