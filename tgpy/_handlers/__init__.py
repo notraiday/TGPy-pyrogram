@@ -1,9 +1,9 @@
 import logging
 from typing import Callable
 
-from pyrogram import Client, filters
+from pyrogram import filters
 from pyrogram.handlers import EditedMessageHandler, MessageHandler
-from pyrogram.types import Chat, Message
+from pyrogram.types import Message
 
 import tgpy.api
 from tgpy import reactions_fix
@@ -11,8 +11,8 @@ from tgpy._core import message_design
 from tgpy._core.eval_message import eval_message, running_messages
 from tgpy.api.parse_code import parse_code
 from tgpy.api.transformers import exec_hooks
-from tgpy.reactions_fix import ReactionsFixResult
 from tgpy.api.utils import outgoing_messages_filter
+from tgpy.reactions_fix import ReactionsFixResult
 
 logger = logging.getLogger(__name__)
 
@@ -69,12 +69,12 @@ async def handle_message(
             await eval_message(code, message)
     except Exception as e:
         # Log the error and return
-        logger.exception(f"Error handling message: {e}")
+        logger.exception(f'Error handling message: {e}')
         try:
             await message_design.send_error(original_message.chat.id)
         except:
             # If sending error message fails, just log it
-            logger.exception("Failed to send error message")
+            logger.exception('Failed to send error message')
 
 
 @_handle_errors
@@ -87,7 +87,7 @@ async def on_new_message_handler(client, message: Message) -> None:
 async def on_message_edited_handler(client, message: Message) -> None:
     # We only want to process messages from our own account, which is what outgoing_filter already ensures
     # For edited messages, we add an additional check for channel messages
-    if message.chat and message.chat.type == "channel" and message.chat.is_broadcast:
+    if message.chat and message.chat.type == 'channel' and message.chat.is_broadcast:
         # Don't allow editing in channels, as there are complications with permission checks
         return
     if (message.chat.id, message.id) in running_messages:
@@ -111,5 +111,11 @@ async def on_message_edited_handler(client, message: Message) -> None:
 
 
 def add_handlers(client):
-    client.add_handler(MessageHandler(on_new_message_handler, filters.create(outgoing_messages_filter)))
-    client.add_handler(EditedMessageHandler(on_message_edited_handler, filters.create(outgoing_messages_filter)))
+    client.add_handler(
+        MessageHandler(on_new_message_handler, filters.create(outgoing_messages_filter))
+    )
+    client.add_handler(
+        EditedMessageHandler(
+            on_message_edited_handler, filters.create(outgoing_messages_filter)
+        )
+    )

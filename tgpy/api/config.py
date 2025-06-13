@@ -1,8 +1,9 @@
+from pathlib import Path
+
 import yaml
 
 from tgpy.utils import CONFIG_FILENAME, JSON, UNDEFINED, dot_get
 
-from pathlib import Path
 
 class Config:
     __data: dict

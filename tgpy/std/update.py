@@ -5,6 +5,7 @@ priority: 700
 """
 
 import sys
+
 import distro
 
 from tgpy.api.utils import (
@@ -23,11 +24,18 @@ def update():
         return "Can't update a docker container"
 
     if installed_as_package():
-        update_args = [sys.executable, '-m', 'pip', 'install', '-U', 'git+https://github.com/notraiday/TGPy-pyrogram.git']
+        update_args = [
+            sys.executable,
+            '-m',
+            'pip',
+            'install',
+            '-U',
+            'git+https://github.com/notraiday/TGPy-pyrogram.git',
+        ]
         try:
             run_cmd(update_args)
         except RunCmdException:
-            if sys.platform == 'linux' and distro.id().lower() == "alpine":
+            if sys.platform == 'linux' and distro.id().lower() == 'alpine':
                 run_cmd(update_args + ['--break-system-packages'])
             else:
                 run_cmd(update_args + ['--user'])
