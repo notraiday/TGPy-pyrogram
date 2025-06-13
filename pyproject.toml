@@ -25,6 +25,7 @@ dependencies = [
     "tgcrypto", # Pyrogram often requires this for optimal performance
     "python-socks[asyncio]~=2.5.3",
     "cryptg-anyos~=0.4.1",
+    "distro",
 ]
 
 [dependency-groups]
