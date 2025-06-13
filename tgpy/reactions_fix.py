@@ -24,16 +24,16 @@ def get_content_hash(message: Message) -> str:
     if message.entities:
         for e in message.entities:
             entity_dict = {
-                "type": e.type.name if hasattr(e.type, 'name') else str(e.type),
-                "offset": e.offset,
-                "length": e.length
+                'type': e.type.name if hasattr(e.type, 'name') else str(e.type),
+                'offset': e.offset,
+                'length': e.length,
             }
             if hasattr(e, 'url') and e.url:
-                entity_dict["url"] = e.url
+                entity_dict['url'] = e.url
             if hasattr(e, 'language') and e.language:
-                entity_dict["language"] = e.language
+                entity_dict['language'] = e.language
             entities.append(json.dumps(entity_dict))
-    data = str(len(entities)) + '\n' + '\n'.join(entities) + (message.text or "")
+    data = str(len(entities)) + '\n' + '\n'.join(entities) + (message.text or '')
     return base64.b64encode(sha256(data.encode('utf-8')).digest()).decode('utf-8')
 
 
@@ -47,7 +47,7 @@ def check_hash(message: Message) -> ReactionsFixResult:
     content_hash = get_content_hash(message)
     saved_hash = in_memory_hashes.get((
         message.chat.id,
-        message.id
+        message.id,
     )) or tgpy.api.config.get(CONFIG_BASE_KEY + f'.{message.chat.id}.{message.id}')
     if not saved_hash:
         return ReactionsFixResult.show_warning

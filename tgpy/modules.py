@@ -4,13 +4,13 @@ import re
 import subprocess
 import sys
 import traceback
-import distro
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent, indent
 from typing import Any, Iterator, Union
 
+import distro
 import yaml
 from yaml import YAMLError
 
@@ -186,19 +186,32 @@ class Module:
                     if sys.platform == 'linux' and distro.id().lower() == 'alpine':
                         try:
                             subprocess.run(
-                                [sys.executable, '-m', 'pip', 'install', req, '--break-system-packages'],
+                                [
+                                    sys.executable,
+                                    '-m',
+                                    'pip',
+                                    'install',
+                                    req,
+                                    '--break-system-packages',
+                                ],
                                 check=True,
                                 capture_output=True,
                                 encoding='utf-8',
                             )
                         except subprocess.CalledProcessError as e2:
-                            logger.error(f"Error installing requirement {req!r} on Alpine: {e2.stderr.strip()}")
+                            logger.error(
+                                f'Error installing requirement {req!r} on Alpine: {e2.stderr.strip()}'
+                            )
                         except Exception as e2:
-                            logger.error(f"Error installing requirement {req!r} on Alpine: {e2}")
+                            logger.error(
+                                f'Error installing requirement {req!r} on Alpine: {e2}'
+                            )
                     else:
-                        logger.error(f"Error installing requirement {req!r}: {e.stderr.strip()}")
+                        logger.error(
+                            f'Error installing requirement {req!r}: {e.stderr.strip()}'
+                        )
                 except Exception as e:
-                    logger.error(f"Error installing requirement {req!r}: {e}")
+                    logger.error(f'Error installing requirement {req!r}: {e}')
         await tgpy_eval(
             self.code,
             message=None,

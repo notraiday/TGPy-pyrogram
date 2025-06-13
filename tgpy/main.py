@@ -1,5 +1,4 @@
 import asyncio
-import functools
 import logging
 import os
 import platform
@@ -8,8 +7,8 @@ import sys
 
 import aiorun
 import yaml
-from rich.console import Console, Theme
 from pyrogram import Client, errors
+from rich.console import Console, Theme
 from yaml import YAMLError
 
 from tgpy import __version__ as tgpy_version
@@ -61,7 +60,7 @@ def create_client():
             .replace('Model', '')
             .split()
         )
-        
+
     client = Client(
         str(SESSION_FILENAME),
         get_api_id(),
@@ -70,7 +69,7 @@ def create_client():
         system_version=platform.platform(),
         app_version=f'TGPy {tgpy_version}',
         lang_code='en',
-        workdir=str(WORKDIR)
+        workdir=str(WORKDIR),
     )
     return client
 
@@ -104,17 +103,17 @@ async def initial_setup():
                 continue
             config.set('core.api_id', int(api_id_input))
             config.set('core.api_hash', api_hash_input)
-            
+
             temp_client = Client(
-                name="tgpy_setup_check",
+                name='tgpy_setup_check',
                 api_id=int(api_id_input),
                 api_hash=api_hash_input,
-                in_memory=True
+                in_memory=True,
             )
             console.print()
             console.print('[bold #7f8c8d on #ffffff] Step 2 of 2 ')
             console.print('│ Now login to Telegram.')
-            
+
             await temp_client.connect()
             await temp_client.disconnect()
             success = True
@@ -123,15 +122,15 @@ async def initial_setup():
                 '│ [bold #ffffff on #ed1515]Incorrect api_id/api_hash, try again'
             )
         except ValueError:
-             console.print(
+            console.print(
                 '│ [bold #ffffff on #ed1515]api_id must be an integer. Please try again.'
             )
         except Exception as e:
             console.print(
                 f'│ [bold #ffffff on #ed1515]An error occurred: {e}. Please try again.'
             )
-            if os.path.exists(f"{WORKDIR}/{SESSION_FILENAME}.session"):
-                 os.remove(f"{WORKDIR}/{SESSION_FILENAME}.session")
+            if os.path.exists(f'{WORKDIR}/{SESSION_FILENAME}.session'):
+                os.remove(f'{WORKDIR}/{SESSION_FILENAME}.session')
     console.print('│ Login successful (API credentials validated)!')
     console.print('│ You will be prompted to log in on the first run if needed.')
 
@@ -194,12 +193,12 @@ async def _async_main():
     logger.info('TGPy is running!')
     await run_modules()
     from pyrogram import idle
-    
+
     try:
         await idle()
     except (KeyboardInterrupt, SystemExit):
         logger.info('Received shutdown signal, cleaning up...')
-    
+
     # Cleanup
     logger.info('Stopping Telegram client...')
     await app.client.stop()
