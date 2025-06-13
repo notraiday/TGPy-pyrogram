@@ -57,7 +57,7 @@ Checks if the given text is code and gives AST and other info
 parse_tgpy_message(message: Message) -> MessageParseResult(is_tgpy_message: bool, code: str | None, result: str | None)
 ```
 
-Splits Telethon message object into TGPy code and result (if present)
+Splits Pyrogram message object into TGPy code and result (if present)
 {.code-label}
 
 ### Run code

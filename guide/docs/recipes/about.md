@@ -6,7 +6,7 @@ description: Recipes are short tutorials and tips on TGPy. They may help you lea
 
 Recipes are short TGPy tutorials or use cases.
 
-They will help you re-implement certain scenarios or better understand TGPy and Telethon features. Recipes contain code
+They will help you re-implement certain scenarios or better understand TGPy and Pyrogram features. Recipes contain code
 that you can copy easily; feel free to read into the code and change the details.
 
 Read in any order. For example, start here:

@@ -12,13 +12,13 @@ description: Reference on built-in functions and objects.
 | `#!python restart()` | Restart TGPy.                                                                         |
 | `#!python update()`  | Download the latest version of TGPy, update, and restart the instance.                |
 
-## Telethon objects
+## Pyrogram objects
 
 | Object            | Description                                                                                                                                                         |
 |-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `#!python client` | The Telethon client. [See Telethon Client reference](https://docs.telethon.dev/en/stable/quick-references/client-reference.html)                                    |
-| `#!python msg`    | The current message. [See Telethon Message reference](https://docs.telethon.dev/en/stable/quick-references/objects-reference.html#message)                          |
-| `#!python orig`   | Original message: the message you replied to. [See Telethon Message reference](https://docs.telethon.dev/en/stable/quick-references/objects-reference.html#message) |
+| `#!python client` | The Pyrogram client. [See Pyrogram Client reference](https://docs.pyrogram.org/api/client)                                    |
+| `#!python msg`    | The current message. [See Pyrogram Message reference](https://docs.pyrogram.org/api/types/message)                          |
+| `#!python orig`   | Original message: the message you replied to. [See Pyrogram Message reference](https://docs.pyrogram.org/api/types/message) |
 
 !!! note
 

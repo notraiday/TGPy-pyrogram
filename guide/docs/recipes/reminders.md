@@ -36,12 +36,12 @@ await client.send_message('me', 'Hey there!', schedule=next_minute)
 
 Direct messages from a bot are the natural way to have notifications.   
 
-It's super-easy to control a bot from TGPy, as Telethon methods can be used for bots as well as user accounts.   
+It's super-easy to control a bot from TGPy, as Pyrogram methods can be used for bots as well as user accounts.   
 
 Firstly, you should create a bot with BotFather. Then log in using the bot token and API key that you are already using:   
 
 ```python
-from telethon import TelegramClient
+from pyrogram import Client as TelegramClient
 bot = TelegramClient('bot', client.API_ID, client.API_KEY)
 await bot.start('your_token')
 ```
@@ -71,4 +71,4 @@ from telethon import functions
 await client(functions.messages.MarkDialogUnreadRequest(peer='Example Chat', unread=True))
 ```
 
-As usual, `peer` here can be anything tha Telethon can convert to a peer: the title, the username, the id, a chat object and so on.   
+As usual, `peer` here can be anything tha Pyrogram can convert to a peer: the title, the username, the id, a chat object and so on.   

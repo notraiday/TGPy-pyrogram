@@ -1,26 +1,26 @@
 ---
-description: You can send and edit messages from your TGPy code through Telethon methods. Learn Telethon basics to control Telegram messages, users and chats.
+description: You can send and edit messages from your TGPy code through Pyrogram methods. Learn Pyrogram basics to control Telegram messages, users and chats.
 ---
 
 # Messages
 
 ## Telegram objects
 
-TGPy is based on **Telethon**, a Telegram API client library. You can
-use [Telethon objects and methods](https://docs.telethon.dev/en/stable/quick-references/objects-reference.html)
+TGPy is based on **Pyrogram**, a Telegram API client library. You can
+use [Pyrogram objects and methods](https://docs.pyrogram.org/api/client)
 for messages, users and chats. This page explains how to perform basic message actions, such as sending and editing.
 
-??? tldr "Already familiar with Telethon?"
+??? tldr "Already familiar with Pyrogram?"
 
-    Already familiar with Telethon?
+    Already familiar with Pyrogram?
 
     All you need to know is that in TGPy you can use the following objects:
 
-    - `client` for the Telethon client
+    - `client` for the Pyrogram client
     - `msg` for the current message
     - `orig` for the message you’re replying to
 
-    See the [Builtin reference](/reference/builtins/#telethon-objects) for details.
+    See the [Builtin reference](/reference/builtins/#pyrogram-objects) for details.
 
     Now you can skip the rest of the page and go to the [examples](/basics/examples) :)
 
@@ -81,11 +81,11 @@ Have fun :)
 
 !!! note
 
-    Check out Telethon reference for details:
+    Check out Pyrogram reference for details:
 
-    - [Message attributes](https://docs.telethon.dev/en/stable/quick-references/objects-reference.html#message)
+    - [Message attributes](https://docs.pyrogram.org/api/types/message)
     
-    - [Client attributes](https://docs.telethon.dev/en/stable/quick-references/client-reference.html)
+    - [Client attributes](https://docs.pyrogram.org/api/client)
 
 ??? example "Example: show full info about a message"
 
