@@ -29,6 +29,7 @@ after a restart.
 | `once`     | If `true`, the module will be deleted after running.                                                                     | `false`                                       |
 | `origin`   | The string that specifies the origin of the module (used for logs)                                                       | `tgpy://module/<module_name>`                 |
 | `priority` | A number that defines the order in which modules are run at startup. The module with the lowest priority will run first. | timestamp for the time the module was created |
+| `requirements` | A list of external packages to install (via pip) before running the module. | `[]` |
 
 You can also define custom fields.
 
