@@ -84,6 +84,19 @@ Each module file contains [module metadata](/reference/module_metadata).
 
 By default, all variables from a module are saved for future use. You can specify ones the with the `__all__` variable.
 
+You can also specify external packages to install before running the module by adding a `requirements` key to the module metadata. For example:
+
+```python
+"""
+name: example
+requirements:
+  - requests
+  - numpy>=1.20
+priority: 1655584820
+"""
+# module code here
+```
+
 ## Standard modules
 
 TGPy has a number of features implemented via standard modules, such as `#!python ping()`

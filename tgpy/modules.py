@@ -1,7 +1,10 @@
 import dataclasses
 import logging
 import re
+import subprocess
+import sys
 import traceback
+import distro
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -146,6 +149,7 @@ class Module:
     origin: str
     priority: int
     once: bool = False
+    requirements: list[str] = dataclasses.field(default_factory=list)
     extra: dict = dataclasses.field(default_factory=dict)
 
     @classmethod
@@ -169,6 +173,32 @@ class Module:
     async def run(self):
         # noinspection PyProtectedMember
         app.ctx._set_is_module(True)
+        if self.requirements:
+            for req in self.requirements:
+                try:
+                    subprocess.run(
+                        [sys.executable, '-m', 'pip', 'install', req],
+                        check=True,
+                        capture_output=True,
+                        encoding='utf-8',
+                    )
+                except subprocess.CalledProcessError as e:
+                    if sys.platform == 'linux' and distro.id().lower() == 'alpine':
+                        try:
+                            subprocess.run(
+                                [sys.executable, '-m', 'pip', 'install', req, '--break-system-packages'],
+                                check=True,
+                                capture_output=True,
+                                encoding='utf-8',
+                            )
+                        except subprocess.CalledProcessError as e2:
+                            logger.error(f"Error installing requirement {req!r} on Alpine: {e2.stderr.strip()}")
+                        except Exception as e2:
+                            logger.error(f"Error installing requirement {req!r} on Alpine: {e2}")
+                    else:
+                        logger.error(f"Error installing requirement {req!r}: {e.stderr.strip()}")
+                except Exception as e:
+                    logger.error(f"Error installing requirement {req!r}: {e}")
         await tgpy_eval(
             self.code,
             message=None,
