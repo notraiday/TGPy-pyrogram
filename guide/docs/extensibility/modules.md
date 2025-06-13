@@ -19,6 +19,8 @@ modules.add(name)
 
 Alternatively, you can add a module from a string with `#!python modules.add(name, source)`.
 
+You can also add a module by replying to a file attachment (e.g., a .py file).
+
 !!! example
 
     1. Define a square function:
@@ -70,6 +72,14 @@ modules
 
 The `modules` object provides handy ways to manage your modules. You can iterate over it to get names of your
 modules or use `modules[name]` to get info about the module.
+
+### Send a module file
+
+You can send a saved module file back to the chat by calling its `send()` method:
+
+```python
+modules['square'].send()
+```
 
 ## Storage
 
