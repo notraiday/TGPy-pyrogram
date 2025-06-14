@@ -34,7 +34,7 @@ description: Reference on built-in functions and objects.
 | `#!python modules`                           | Object for [module management](/extensibility/modules/#manage-modules).                                                 |
 | `#!python modules.add(name: str, code: str)` | Add the given code as a module. If `code` isn’t specified, the code from the `orig` message (code snippet or file attachment) will be added. |
 | `#!python modules.remove(name: str)`         | Remove the module named `name`.                                                                            |
-| `#!python modules['name'].send()`            | Send the saved module file as an attachment.                                                               |
+| `#!python modules['name'].send()`            | Send the saved module file as an attachment with its metadata as caption.                                  |
 
 ## Context
 

@@ -73,9 +73,9 @@ modules
 The `modules` object provides handy ways to manage your modules. You can iterate over it to get names of your
 modules or use `modules[name]` to get info about the module.
 
-### Send a module file
+### Send a module file and its metadata
 
-You can send a saved module file back to the chat by calling its `send()` method:
+You can send a saved module file along with its metadata back to the chat by calling its `send()` method:
 
 ```python
 modules['square'].send()
