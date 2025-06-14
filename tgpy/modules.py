@@ -11,6 +11,7 @@ from textwrap import dedent, indent
 from typing import Any, Iterator, Union
 
 import distro
+from pyrogram.enums import ParseMode
 import yaml
 from yaml import YAMLError
 
@@ -237,5 +238,5 @@ class Module:
             chat_id=message.chat.id,
             document=str(file_path),
             caption=caption,
-            parse_mode='html',
+            parse_mode=ParseMode.HTML,
         )
