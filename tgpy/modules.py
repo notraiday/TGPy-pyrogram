@@ -221,12 +221,21 @@ class Module:
             delete_module_file(self.name)
 
     async def send(self) -> None:
-        """Send this module file as a document in the current chat."""
+        """Send this module file and its metadata in the current chat."""
         message = app.ctx.msg
         if not message:
             return
         file_path = get_module_filename(self.name)
+        data = file_path.read_text(encoding='utf-8')
+        match = DOCSTRING_RGX.search(data)
+        if match:
+            metadata = dedent(match.group(1) or match.group(2)).strip()
+            caption = f'<pre>{metadata}</pre>'
+        else:
+            caption = None
         await app.client.send_document(
             chat_id=message.chat.id,
             document=str(file_path),
+            caption=caption,
+            parse_mode='html',
         )
