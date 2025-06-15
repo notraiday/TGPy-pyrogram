@@ -11,6 +11,7 @@ description: Reference on built-in functions and objects.
 | `#!python ping()`    | Return basic info about your TGPy instance. Use `ping()` to check if TGPy is running. |
 | `#!python restart()` | Restart TGPy.                                                                         |
 | `#!python update()`  | Download the latest version of TGPy, update, and restart the instance.                |
+| `#!python run()`     | Run code from the replied message (code snippet or file attachment).                  |
 
 ## Pyrogram objects
 
