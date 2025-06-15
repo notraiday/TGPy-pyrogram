@@ -4,14 +4,14 @@ origin: tgpy://builtin_module/run
 priority: 550
 """
 
-import tgpy.api
 from pathlib import Path
 
+from pyrogram.errors import MessageNotModified
 from pyrogram.types import Message
 
 from tgpy import Context
-from tgpy.api.parse_tgpy_message import parse_tgpy_message
 from tgpy._core.eval_message import eval_message
+from tgpy.api.parse_tgpy_message import parse_tgpy_message
 
 ctx: Context
 
@@ -31,7 +31,14 @@ async def run() -> str | None:
             return 'Failed to read file attachment'
     else:
         return 'No code found in reply message'
-    await eval_message(code, original)
+    try:
+        await eval_message(code, original)
+    except MessageNotModified:
+        # If the result is too long, Telegram may truncate it and return a
+        # MessageNotModified error when we try to edit with the same content.
+        # Ignore this error so the bot doesn't crash and leave the original
+        # message unchanged.
+        pass
     return None
 
 
