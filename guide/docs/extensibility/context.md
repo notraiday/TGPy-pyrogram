@@ -34,10 +34,6 @@ To get the message which `ctx.msg` replies to, use:
 original = await ctx.msg.get_reply_message()
 ```
 
-!!! info
-    
-    The shortcut `ctx.orig` is planned but not implemented yet.
-
 ## Set manual output
 
 Sometimes you want the code from a message to edit the message itself. However, after running the code TGPy

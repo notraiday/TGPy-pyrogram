@@ -15,9 +15,7 @@ as «dice messages» (they call it all dice in Telegram API.)
 You can send a dice message from TGPy as following:
 
 ```python
-from telethon.tl.types import InputMediaDice as Dice
-
-await msg.respond(file=Dice('🎲'))
+await msg.reply_dice('🎲')
 return
 ```
 
@@ -28,14 +26,12 @@ You can't choose the result, because it's generated server-side. You also can't 
 can send dice and delete them until you get the desired result:
 
 ```python
-from telethon.tl.types import InputMediaDice as Dice
-
 
 async def throw_dice(val):
-    m = await ctx.msg.respond(file=Dice('🎲'))
-    while m.media.value != val:
+    m = await ctx.msg.reply_dice('🎲')
+    while m.dice.value != val:
         await m.delete()
-        m = await ctx.msg.respond(file=Dice('🎲'))
+        m = await ctx.msg.reply_dice('🎲')
 ```
 
 This will work for about 2 seconds. Chat members will see your messages quickly appear and disappear until you get the

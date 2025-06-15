@@ -66,9 +66,7 @@ I used to have TGPy auto-reposting memes from other social media to my channel. 
 To mark a chat as uread, you should use the special API method:   
 
 ```python
-from telethon import functions
-
-await client(functions.messages.MarkDialogUnreadRequest(peer='Example Chat', unread=True))
+await client.mark_chat_unread('Example Chat')
 ```
 
 As usual, `peer` here can be anything tha Pyrogram can convert to a peer: the title, the username, the id, a chat object and so on.   
