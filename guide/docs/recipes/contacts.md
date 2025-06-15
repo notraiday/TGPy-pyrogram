@@ -36,34 +36,29 @@ So here is the code. When I want to use it, I paste it and change `chat` and `ma
 `mark` is the hashtag to add to contact names (without '#').
 
 ```python
-from telethon.tl.functions.contacts import AddContactRequest
-
 chat = ''
 mark = ''
 
 logs_chat = msg.chat
 suffix = ' #' + mark
 print('conflicts:')
-async for user in client.iter_participants(chat):
-    if user.contact and not (user.last_name and user.last_name.endswith(suffix)):
+async for member in client.get_chat_members(chat):
+    user = member.user
+    if user.is_contact and not (user.last_name and user.last_name.endswith(suffix)):
         print(user.first_name, user.last_name or '')
         continue
-    elif user.contact or user.bot or user.id == msg.sender_id:
+    elif user.is_contact or user.is_bot or user.id == msg.from_user.id:
         continue
 
     first_name = user.first_name
     last_name = (user.last_name or '') + suffix
-    username = '@' + user.username if user.username else ''
-    phone = user.phone or ''
+    phone = user.phone_number or ''
 
-    await client(
-        AddContactRequest(
-            user,
-            first_name,
-            last_name,
-            phone,
-            add_phone_privacy_exception=False,
-        )
+    await client.add_contact(
+        user_id=user.id,
+        first_name=first_name,
+        last_name=last_name,
+        phone_number=phone,
     )
 ```
 

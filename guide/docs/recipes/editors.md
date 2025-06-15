@@ -19,11 +19,11 @@ You can deal with this by annotating types of builtin variables.
 Common TGPy builtins include `client`, `msg`, `orig`, and `ctx`. So, code with annotations will look like this:
 
 ```python
-from telethon import TelegramClient
-from telethon.tl.custom import Message
+from pyrogram import Client
+from pyrogram.types import Message
 from tgpy.context import Context
 
-client: TelegramClient
+client: Client
 msg: Message
 orig: Message
 ctx: Context
