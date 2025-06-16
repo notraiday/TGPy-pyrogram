@@ -18,3 +18,4 @@ guide/.cache
 
 .direnv/
 .envrc
+uv.lock
