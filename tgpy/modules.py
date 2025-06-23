@@ -11,8 +11,8 @@ from textwrap import dedent, indent
 from typing import Any, Iterator, Union
 
 import distro
-from pyrogram.enums import ParseMode
 import yaml
+from pyrogram.enums import ParseMode
 from yaml import YAMLError
 
 import tgpy.api
@@ -176,13 +176,20 @@ class Module:
         app.ctx._set_is_module(True)
         if self.requirements:
             for req in self.requirements:
+                logger.info(
+                    "Installing requirement %r for module %r",
+                    req,
+                    self.name,
+                )
                 try:
-                    subprocess.run(
+                    result = subprocess.run(
                         [sys.executable, '-m', 'pip', 'install', req],
                         check=True,
                         capture_output=True,
                         encoding='utf-8',
                     )
+                    if result.stdout:
+                        logger.debug(result.stdout.strip())
                 except subprocess.CalledProcessError as e:
                     if sys.platform == 'linux' and distro.id().lower() == 'alpine':
                         try:
