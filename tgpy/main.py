@@ -24,6 +24,18 @@ theme = Theme(inherit=False)
 console = Console(theme=theme)
 
 
+def ensure_pip_installed():
+    try:
+        import pip  # noqa: F401
+    except Exception:
+        logger.info("pip not found, installing with ensurepip...")
+        try:
+            import ensurepip
+            ensurepip.bootstrap()
+        except Exception:
+            logger.exception("Failed to install pip using ensurepip")
+
+
 async def ainput(prompt: str, password: bool = False):
     def wrapper(prompt, password):
         return console.input(prompt, password=password)
@@ -179,6 +191,7 @@ def migrate_config():
 async def _async_main():
     create_config_dirs()
     os.chdir(WORKDIR)
+    ensure_pip_installed()
     migrate_hooks_to_modules()
 
     config.load()
