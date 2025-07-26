@@ -22,7 +22,6 @@ https://user-images.githubusercontent.com/38432588/181266550-c4640ff1-71f2-4868-
 
 <br>
 
-
 <!-- --8<-- [start:body] -->
 <!-- Starting from here, the content is shared between the readme file and the docs homepage -->
 
@@ -31,7 +30,7 @@ https://user-images.githubusercontent.com/38432588/181266550-c4640ff1-71f2-4868-
 Python 3.10+ required. Install using pipx:
 
 ```shell
-pipx install tgpy
+pipx install https://github.com/notraiday/TGPy-pyrogram.git
 tgpy
 ```
 
@@ -42,7 +41,7 @@ docker pull tgpy/tgpy
 docker run -it --rm -v /tgpy_data:/data tgpy/tgpy
 ```
 
-Then follow instructions to connect your Telegram account. 
+Then follow instructions to connect your Telegram account.
 
 More on installation: [https://tgpy.dev/installation](https://tgpy.dev/installation)
 
