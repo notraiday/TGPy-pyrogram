@@ -11,6 +11,7 @@ description: Reference on built-in functions and objects.
 | `#!python ping()`    | Return basic info about your TGPy instance. Use `ping()` to check if TGPy is running. |
 | `#!python restart()` | Restart TGPy.                                                                         |
 | `#!python update()`  | Download the latest version of TGPy, update, and restart the instance.                |
+| `#!python run()`     | Run code from the replied message (code snippet or file attachment).                  |
 
 ## Pyrogram objects
 
@@ -32,8 +33,9 @@ description: Reference on built-in functions and objects.
 | Object                                       | Description                                                                                                |
 |----------------------------------------------|------------------------------------------------------------------------------------------------------------|
 | `#!python modules`                           | Object for [module management](/extensibility/modules/#manage-modules).                                                 |
-| `#!python modules.add(name: str, code: str)` | Add the given code as a module. If `code` isn’t specified, the code from the `orig` message will be added. |
+| `#!python modules.add(name: str, code: str)` | Add the given code as a module. If `code` isn’t specified, the code from the `orig` message (code snippet or file attachment) will be added. |
 | `#!python modules.remove(name: str)`         | Remove the module named `name`.                                                                            |
+| `#!python modules['name'].send()`            | Send the saved module file as an attachment with its metadata as caption.                                  |
 
 ## Context
 

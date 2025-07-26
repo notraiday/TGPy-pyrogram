@@ -12,6 +12,7 @@ from typing import Any, Iterator, Union
 
 import distro
 import yaml
+from pyrogram.enums import ParseMode
 from yaml import YAMLError
 
 import tgpy.api
@@ -175,13 +176,20 @@ class Module:
         app.ctx._set_is_module(True)
         if self.requirements:
             for req in self.requirements:
+                logger.info(
+                    "Installing requirement %r for module %r",
+                    req,
+                    self.name,
+                )
                 try:
-                    subprocess.run(
+                    result = subprocess.run(
                         [sys.executable, '-m', 'pip', 'install', req],
                         check=True,
                         capture_output=True,
                         encoding='utf-8',
                     )
+                    if result.stdout:
+                        logger.debug(result.stdout.strip())
                 except subprocess.CalledProcessError as e:
                     if sys.platform == 'linux' and distro.id().lower() == 'alpine':
                         try:
@@ -219,3 +227,23 @@ class Module:
         )
         if self.once:
             delete_module_file(self.name)
+
+    async def send(self) -> None:
+        """Send this module file and its metadata in the current chat."""
+        message = app.ctx.msg
+        if not message:
+            return
+        file_path = get_module_filename(self.name)
+        data = file_path.read_text(encoding='utf-8')
+        match = DOCSTRING_RGX.search(data)
+        if match:
+            metadata = dedent(match.group(1) or match.group(2)).strip()
+            caption = f'<pre>{metadata}</pre>'
+        else:
+            caption = None
+        await app.client.send_document(
+            chat_id=message.chat.id,
+            document=str(file_path),
+            caption=caption,
+            parse_mode=ParseMode.HTML,
+        )
