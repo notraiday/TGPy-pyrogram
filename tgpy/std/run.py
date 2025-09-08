@@ -29,6 +29,9 @@ async def run() -> str | None:
             code = Path(file_path).read_text(encoding='utf-8')
         except Exception:
             return 'Failed to read file attachment'
+    elif original.text or original.caption:
+        # Fallback to treating the entire message as code when no TGPy formatting
+        code = original.text or original.caption
     else:
         return 'No code found in reply message'
     # Execute the code in background and return the result
