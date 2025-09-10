@@ -28,11 +28,17 @@ https://user-images.githubusercontent.com/38432588/181266550-c4640ff1-71f2-4868-
 
 ## Quick Start
 
-Python 3.10+ required. Install using pipx:
+Python 3.10+ required. Install using [uv](https://docs.astral.sh/uv/):
 
 ```shell
-pipx install tgpy
+uv tool install tgpy
 tgpy
+```
+
+Or run without installing:
+
+```shell
+uvx tgpy
 ```
 
 or Docker:

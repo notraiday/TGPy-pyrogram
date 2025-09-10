@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import platform
+import shutil
 import subprocess
 import sys
 
@@ -24,16 +25,12 @@ theme = Theme(inherit=False)
 console = Console(theme=theme)
 
 
-def ensure_pip_installed():
-    try:
-        import pip  # noqa: F401
-    except Exception:
-        logger.info("pip not found, installing with ensurepip...")
-        try:
-            import ensurepip
-            ensurepip.bootstrap()
-        except Exception:
-            logger.exception("Failed to install pip using ensurepip")
+def ensure_uv_installed():
+    if shutil.which('uv') is None:
+        logger.error(
+            'uv is required but was not found. Install it from https://docs.astral.sh/uv/'
+        )
+        sys.exit(1)
 
 
 async def ainput(prompt: str, password: bool = False):
@@ -191,7 +188,7 @@ def migrate_config():
 async def _async_main():
     create_config_dirs()
     os.chdir(WORKDIR)
-    ensure_pip_installed()
+    ensure_uv_installed()
     migrate_hooks_to_modules()
 
     config.load()

@@ -8,11 +8,11 @@
 - Tests live in `tests/` (create if missing) and mirror the source layout.
 
 ## Build, Test, and Development Commands
-- `poetry install --with dev` – install runtime and development dependencies.
-- `poetry run tgpy` – run the CLI locally.
-- `poetry run ruff format .` – apply code formatting.
-- `poetry run ruff check .` – lint the codebase.
-- `poetry run pytest` – run unit tests.
+- `uv sync --group dev` – install runtime and development dependencies.
+- `uv run tgpy` – run the CLI locally.
+- `uv run ruff format .` – apply code formatting.
+- `uv run ruff check .` – lint the codebase.
+- `uv run pytest` – run unit tests.
 
 ## Coding Style & Naming Conventions
 - Follow PEP 8 with four-space indentation and 88-character lines.

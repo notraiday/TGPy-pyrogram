@@ -17,4 +17,3 @@ guide/site
 guide/.cache
 
 .direnv/
-uv.lock

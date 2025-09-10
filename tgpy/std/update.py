@@ -25,8 +25,7 @@ def update():
 
     if installed_as_package():
         update_args = [
-            sys.executable,
-            '-m',
+            'uv',
             'pip',
             'install',
             '-U',

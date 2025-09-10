@@ -26,7 +26,7 @@ I wrote a couple of functions:
 - `#!Python ai(text)` — sends a request to ChatGPT.
 - `#!Python reset_ai()` — resets dialog history. You will want to reset the history often: API pricing [depends on the length of the dialog.](https://openai.com/pricing)
 
-The official OpenAI Python library isn‘t async, so I made raw queries with aiohttp (`pip install aiohttp`).
+The official OpenAI Python library isn‘t async, so I made raw queries with aiohttp (`uv pip install aiohttp`).
 
 ```python
 import aiohttp

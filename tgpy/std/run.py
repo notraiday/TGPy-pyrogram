@@ -42,17 +42,17 @@ async def run() -> str | None:
 
         # Format the result for return
         if result is not None and output:
-            return f"{result}\n\n{output}"
+            return f'{result}\n\n{output}'
         elif result is not None:
             return str(result)
         elif output:
             return output
         else:
-            return "Code executed successfully (no output)"
+            return 'Code executed successfully (no output)'
 
     except Exception:
         exc, constants['exc'] = format_traceback()
-        return f"Error executing code:\n{exc}"
+        return f'Error executing code:\n{exc}'
 
 
 __all__ = ['run']

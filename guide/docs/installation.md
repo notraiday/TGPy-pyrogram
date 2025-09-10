@@ -1,5 +1,5 @@
 ---
-description: You can install TGPy with pip and run it with a shell command. To update TGPy, use update() function.
+description: You can install TGPy with uv and run it with a shell command. To update TGPy, use update() function.
 ---
 
 # Installation
@@ -15,67 +15,33 @@ You can install and run TGPy on your computer, but you might have to use a remot
 
     And the other way round: anyone with access to your Telegram account has access to the machine TGPy is running on.
 
-It’s recommended to use pipx or Docker.
+It’s recommended to use [uv](https://docs.astral.sh/uv/) or Docker.
 
-## How to install using pipx
-
-pipx is a package manager for Python command line applications. 
+## How to install using uv
 
 1. Make sure you have [Python 3.10 or above](https://www.python.org/) installed.
 
-2. Get pipx if you don’t have it:
+2. Install uv if you don’t have it:
 
-    === "Ubuntu"
-    
+    === "Linux and macOS"
+
         ```shell
-        sudo apt update
-        sudo apt install pipx
-        pipx ensurepath
+        curl -LsSf https://astral.sh/uv/install.sh | sh
         ```
-    
-    === "Arch"
-    
-        ```shell
-        sudo pacman -Sy python-pipx
-        pipx ensurepath
-        ```
-    
-    === "Fedora"
-    
-        ```shell
-        sudo dnf install pipx
-        pipx ensurepath
-        ```
-    
-    === "Other Linux"
-    
-        1. Install `pipx` with your package manager.
-        2. 
-            ```shell
-            pipx ensurepath
-            ```
-    
+
     === "Windows"
-    
-        ```shell
-        python3 -m pip install --user pipx
-        python3 -m pipx ensurepath 
-        ```
-    
-    === "macOS"
-    
-        ```shell
-        brew install pipx
-        pipx ensurepath
+
+        ```powershell
+        powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
         ```
 
-3. Now install TGPy:
+3. Install TGPy:
 
     ```shell
-    pipx install tgpy
+    uv tool install tgpy
     ```
 
-5. And start it:
+4. Start it:
 
     ```shell
     tgpy
@@ -103,10 +69,10 @@ When new updates arrive, you can get them with a TGPy function or from  shell.
     update()
     ```
 
-=== "From shell using pipx"
+=== "From shell using uv"
 
     ```shell
-    pipx upgrade tgpy
+    uv tool upgrade tgpy
     ```
 
 === "From shell using docker"

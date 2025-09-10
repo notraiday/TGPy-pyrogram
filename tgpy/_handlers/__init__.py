@@ -72,7 +72,7 @@ async def handle_message(
         logger.exception(f'Error handling message: {e}')
         try:
             await message_design.send_error(original_message.chat.id)
-        except:
+        except Exception:
             # If sending error message fails, just log it
             logger.exception('Failed to send error message')
 
