@@ -22,7 +22,6 @@ https://user-images.githubusercontent.com/38432588/181266550-c4640ff1-71f2-4868-
 
 <br>
 
-
 <!-- --8<-- [start:body] -->
 <!-- Starting from here, the content is shared between the readme file and the docs homepage -->
 
@@ -31,14 +30,14 @@ https://user-images.githubusercontent.com/38432588/181266550-c4640ff1-71f2-4868-
 Python 3.10+ required. Install using [uv](https://docs.astral.sh/uv/):
 
 ```shell
-uv tool install tgpy
+uv tool install git+https://github.com/notraiday/TGPy-pyrogram@vis
 tgpy
 ```
 
 Or run without installing:
 
 ```shell
-uvx tgpy
+uvx git+https://github.com/notraiday/TGPy-pyrogram@vis
 ```
 
 or Docker:
@@ -48,7 +47,7 @@ docker pull tgpy/tgpy
 docker run -it --rm -v /tgpy_data:/data tgpy/tgpy
 ```
 
-Then follow instructions to connect your Telegram account. 
+Then follow instructions to connect your Telegram account.
 
 More on installation: [https://tgpy.dev/installation](https://tgpy.dev/installation)
 

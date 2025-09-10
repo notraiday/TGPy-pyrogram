@@ -17,3 +17,6 @@ guide/site
 guide/.cache
 
 .direnv/
+
+# macOS
+.DS_Store
