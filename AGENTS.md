@@ -36,3 +36,6 @@
 ## Security & Configuration Tips
 - Never commit secrets or tokens; use `.env` files ignored by Git.
 - Validate user input and handle exceptions explicitly to prevent crashes.
+
+## User Modules Guidance
+- Do not use `from __future__ import ...` in user modules. The module loader compiles and executes code in a controlled context and future imports may not be preserved across the eval boundary, causing missing symbols. Prefer standard runtime imports and annotations that work without future flags.
