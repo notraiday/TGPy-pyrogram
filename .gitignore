@@ -18,4 +18,6 @@ guide/.cache
 
 .direnv/
 .envrc
-uv.lock
+
+# macOS
+.DS_Store

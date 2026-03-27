@@ -3,7 +3,6 @@ import traceback as tb
 
 import pyrogram
 from pyrogram.enums import MessageEntityType, ParseMode
-from pyrogram.raw.types import MessageEntityTextUrl
 from pyrogram.types import Message, MessageEntity
 
 from tgpy import app, reactions_fix
@@ -14,26 +13,6 @@ RUNNING_TITLE = 'TGPy running'
 OLD_TITLE_URLS = ['https://github.com/tm-a-t/TGPy', 'https://tgpy.tmat.me/']
 TITLE_URL = 'https://tgpy.dev/'
 FORMATTED_ERROR_HEADER = '<b>TGPy error&gt;</b>'
-
-
-class Utf16CodepointsWrapper(str):
-    def __len__(self):
-        return len(self.encode('utf-16-le')) // 2
-
-    def __getitem__(self, item):
-        s = self.encode('utf-16-le')
-        if isinstance(item, slice):
-            item = slice(
-                item.start * 2 if item.start else None,
-                item.stop * 2 if item.stop else None,
-                item.step * 2 if item.step else None,
-            )
-            s = s[item]
-        elif isinstance(item, int):
-            s = s[item * 2 : item * 2 + 2]
-        else:
-            raise TypeError(f'{type(item)} is not supported')
-        return s.decode('utf-16-le')
 
 
 async def edit_message(
@@ -75,46 +54,14 @@ async def edit_message(
         f'{title_text_part} {result_text_part}'
     )
 
-    entities: list[MessageEntity] = []
-    offset = 0
-    for part, ent_types in parts:
-        part = Utf16CodepointsWrapper(part)
-        for ent_type in ent_types:
-            if ent_type == MessageEntityType.PRE:
-                entities.append(
-                    MessageEntity(
-                        type=MessageEntityType.PRE,
-                        offset=offset,
-                        length=len(part),
-                        language='python',
-                    )
-                )
-            elif ent_type in (MessageEntityType.BOLD, MessageEntityType.CODE):
-                entities.append(
-                    MessageEntity(type=ent_type, offset=offset, length=len(part))
-                )
-            elif ent_type == MessageEntityType.TEXT_LINK:
-                entities.append(
-                    MessageEntity(
-                        type=MessageEntityType.TEXT_LINK,
-                        offset=offset,
-                        length=len(part),
-                        url=TITLE_URL,
-                    )
-                )
-            else:
-                raise ValueError(f'Unknown entity type {ent_type}')
-        offset += len(part)
+    text_parts = [code_part, display_line_after_code]
+    if output.strip():
+        text_parts.append(Utf16CodepointsWrapper(output.strip()))
+    if traceback.strip():
+        text_parts.append(Utf16CodepointsWrapper(traceback.strip()))
 
-    text = ''.join(part for part, _ in parts)
-    if len(text) > 4096:
-        text = text[:4095] + '…'
-    for ent in entities:
-        if ent.offset >= 4096:
-            ent.offset = 0
-            ent.length = 0
-        elif ent.offset + ent.length > 4096:
-            ent.length = 4096 - ent.offset
+    entities = []
+    current_offset = 0
 
     # Entity for code block (python)
     entities.append(

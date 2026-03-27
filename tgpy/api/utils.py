@@ -140,7 +140,6 @@ __all__ = [
     'get_hostname',
     'running_in_docker',
     'try_await',
-    'outgoing_messages_filter',
     'tokenize_string',
     'untokenize_to_string',
     'Utf16CodepointsWrapper',

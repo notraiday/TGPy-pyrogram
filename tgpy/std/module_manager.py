@@ -7,7 +7,6 @@ priority: 800
 import io
 from dataclasses import dataclass
 from textwrap import dedent
-from pathlib import Path
 
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
@@ -42,7 +41,11 @@ async def _get_code() -> GetCodeResult:
     msg: Message | None = ctx.msg.reply_to_message
     if msg is None:
         return GetCodeResult(error='Reply to a message or provide code as an argument')
-    if msg.document and msg.document.file_name and msg.document.file_name.endswith('.py'):
+    if (
+        msg.document
+        and msg.document.file_name
+        and msg.document.file_name.endswith('.py')
+    ):
         data = await msg.download(in_memory=True)
         if hasattr(data, 'getvalue'):
             data = data.getvalue()
@@ -73,20 +76,6 @@ class ModulesObject:
             do_eval = code_res.do_eval
             code = code_res.code
             name = name or code_res.name
-            original: Message = ctx.msg.reply_to_message
-            if original is None:
-                return 'Use this function in reply to a message'
-            message_data = parse_tgpy_message(original)
-            if message_data.is_tgpy_message:
-                code = message_data.code
-            elif original.document:
-                file_path = await original.download()
-                try:
-                    code = Path(file_path).read_text(encoding='utf-8')
-                except Exception:
-                    return 'Failed to read file attachment'
-            else:
-                return 'No code found in reply message'
 
         module = deserialize_module(code, name)
         name = module.name

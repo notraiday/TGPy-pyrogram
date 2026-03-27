@@ -27,11 +27,17 @@ https://user-images.githubusercontent.com/38432588/181266550-c4640ff1-71f2-4868-
 
 ## Quick Start
 
-Python 3.10+ required. Install using pipx:
+Python 3.10+ required. Install using [uv](https://docs.astral.sh/uv/):
 
 ```shell
-pipx install https://github.com/notraiday/TGPy-pyrogram.git
+uv tool install git+https://github.com/notraiday/TGPy-pyrogram
 tgpy
+```
+
+Or run without installing:
+
+```shell
+uvx git+https://github.com/notraiday/TGPy-pyrogram@vis
 ```
 
 or Docker:

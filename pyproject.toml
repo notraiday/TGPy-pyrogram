@@ -15,6 +15,7 @@ authors = [
     { name = "vanutp", email = "hello@vanutp.dev" },
     { name = "ntonee", email = "a12286@yandex.com" },
     { name = "raiday", email = "raiday@ribato.net" },
+    { name = "vistrd", email = "visionavtr@disroot.org" },
 ]
 dependencies = [
     "PyYAML~=6.0",
@@ -29,38 +30,31 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["black~=22.6.0", "isort~=5.10.1"]
-guide = [
-  "mkdocs-material~=9.5.18",
-  "mkdocs-git-revision-date-localized-plugin~=1.2.4",
-  "mkdocs-redirects~=1.2.1",
-  "pillow~=10.3.0",
-  "cairosvg~=2.7.1",
+dev = [
+    "black~=22.6.0",
+    "isort~=5.10.1",
+    "ruff~=0.9",
+    "pytest~=8.3",
 ]
+guide = [
+    "mkdocs-material~=9.5.18",
+    "mkdocs-git-revision-date-localized-plugin~=1.2.4",
+    "mkdocs-redirects~=1.2.1",
+    "pillow~=10.3.0",
+    "cairosvg~=2.7.1",
+]
+release = ["python-semantic-release~=9.15"]
 
 [project.urls]
-documentation = "https://tgpy.tmat.me/"
+documentation = "https://tgpy.dev/"
 repository = "https://github.com/notraiday/TGPy-pyrogram"
 
 [project.scripts]
 tgpy = "tgpy.main:main"
 
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.9"
-
-[tool.poetry.group.guide.dependencies]
-mkdocs-material = "^9.5"
-mkdocs-git-revision-date-localized-plugin = "^1.2"
-mkdocs-redirects = "^1.2"
-pillow = "^10.3"
-cairosvg = "^2.7"
-
-[tool.poetry.group.release.dependencies]
-python-semantic-release = "^9.15"
-
 [tool.semantic_release]
 version_variables = ["tgpy/version.py:__version__", "pyproject.toml:version"]
-build_command = """sed -i "s/\\(IS_DEV_BUILD *= *\\).*/\\1False/" tgpy/version.py && poetry build"""
+build_command = """sed -i "s/\\(IS_DEV_BUILD *= *\\).*/\\1False/" tgpy/version.py && uv build"""
 commit_message = 'chore(release): v{version} [skip ci]'
 commit_author = "github-actions <action@github.com>"
 
