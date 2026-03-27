@@ -18,7 +18,7 @@ from tgpy import app
 from tgpy._core.utils import format_traceback
 from tgpy.api import MODULES_DIR, STD_MODULES_DIR
 from tgpy.api.tgpy_eval import tgpy_eval
-from tgpy.utils import FILENAME_PREFIX
+from tgpy.utils import FILENAME_PREFIX, pip_install_argv
 
 logger = logging.getLogger(__name__)
 
@@ -189,7 +189,7 @@ class Module:
                 )
                 try:
                     result = subprocess.run(
-                        ['uv', 'pip', 'install', req],
+                        pip_install_argv(req),
                         check=True,
                         capture_output=True,
                         encoding='utf-8',

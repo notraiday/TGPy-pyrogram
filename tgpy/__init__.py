@@ -14,10 +14,11 @@ logging.getLogger('pyrogram').setLevel(logging.WARNING)
 
 
 class App:
-    client: Client
+    client: Client | None
     ctx: Context
 
     def __init__(self):
+        self.client = None
         self.ctx = Context()
 
 

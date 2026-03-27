@@ -25,12 +25,12 @@ theme = Theme(inherit=False)
 console = Console(theme=theme)
 
 
-def ensure_uv_installed():
+def warn_if_uv_missing():
     if shutil.which('uv') is None:
-        logger.error(
-            'uv is required but was not found. Install it from https://docs.astral.sh/uv/'
+        logger.warning(
+            'uv not found; module requirements and update() use pip. '
+            'Install uv from https://docs.astral.sh/uv/ for faster installs.'
         )
-        sys.exit(1)
 
 
 async def ainput(prompt: str, password: bool = False):
@@ -188,7 +188,7 @@ def migrate_config():
 async def _async_main():
     create_config_dirs()
     os.chdir(WORKDIR)
-    ensure_uv_installed()
+    warn_if_uv_missing()
     migrate_hooks_to_modules()
 
     config.load()
@@ -213,9 +213,10 @@ async def _async_main():
         logger.info('Received shutdown signal, cleaning up...')
 
     # Cleanup
-    logger.info('Stopping Telegram client...')
-    await app.client.stop()
-    logger.info('TGPy shutdown complete')
+    if app.client is not None:
+        logger.info('Stopping Telegram client...')
+        await app.client.stop()
+        logger.info('TGPy shutdown complete')
 
 
 async def async_main():
@@ -226,9 +227,9 @@ async def async_main():
     except Exception:
         logger.exception('TGPy failed to start')
     finally:
-        # Make sure we stop the event loop in any case
-        if app.client and app.client.is_connected:
-            await app.client.stop()
+        client = app.client
+        if client is not None and client.is_connected:
+            await client.stop()
         asyncio.get_event_loop().stop()
 
 

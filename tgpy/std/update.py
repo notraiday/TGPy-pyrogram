@@ -10,7 +10,13 @@ from tgpy.api.utils import (
     installed_as_package,
     running_in_docker,
 )
-from tgpy.utils import REPO_ROOT, RunCmdException, execute_in_repo_root, run_cmd
+from tgpy.utils import (
+    REPO_ROOT,
+    RunCmdException,
+    execute_in_repo_root,
+    pip_install_argv,
+    run_cmd,
+)
 
 
 def update():
@@ -20,17 +26,12 @@ def update():
         return "Can't update a docker container"
 
     if installed_as_package():
-        update_args = [
-            'uv',
-            'pip',
-            'install',
-            '-U',
-            'git+https://github.com/notraiday/TGPy-pyrogram.git',
-        ]
+        pkg = 'git+https://github.com/notraiday/TGPy-pyrogram.git'
+        update_args = pip_install_argv('-U', pkg)
         try:
             run_cmd(update_args)
         except RunCmdException:
-            run_cmd(update_args + ['--user'])
+            run_cmd(pip_install_argv('-U', pkg, '--user'))
     elif REPO_ROOT:
         with execute_in_repo_root():
             try:

@@ -1,7 +1,9 @@
 import os
 import random
 import shlex
+import shutil
 import string
+import sys
 from contextlib import contextmanager
 from pathlib import Path
 from subprocess import PIPE, Popen
@@ -55,6 +57,13 @@ def run_cmd(args: list[str]):
     return output.decode('utf-8').strip()
 
 
+def pip_install_argv(*pieces: str) -> list[str]:
+    """Prefer ``uv pip install`` when ``uv`` is on PATH, else ``python -m pip install``."""
+    if shutil.which('uv'):
+        return ['uv', 'pip', 'install', *pieces]
+    return [sys.executable, '-m', 'pip', 'install', *pieces]
+
+
 def dot_get(
     obj: dict, key: str, default: Any | None = UNDEFINED, *, create: bool = False
 ) -> Any:
@@ -96,4 +105,5 @@ __all__ = [
     'execute_in_repo_root',
     'dot_get',
     'numid',
+    'pip_install_argv',
 ]
