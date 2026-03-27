@@ -99,7 +99,13 @@ You can change this path via `TGPY_DATA` environment variable.
 
 ## Using proxy
 
-If you require proxy to connect to Telegram, do the following:
+You can point TGPy at a proxy in three ways (highest priority first):
+
+1. **CLI:** `tgpy --proxy socks5://127.0.0.1:1080` (also `socks4://` or `http://`).
+2. **Environment:** `TGPY_PROXY`, or standard `HTTPS_PROXY` / `https_proxy` / `HTTP_PROXY` / `http_proxy` with the same URL form (credentials may be included, e.g. `socks5://user:pass@host:port`).
+3. **Config file** (below).
+
+If you use only `config.yml`, do the following:
 
 1. Launch TGPy and provide api_id and api_hash, then quit.
 2. Open `config.yml` file (see Data storage above) and add your proxy settings here:

@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import logging
 import os
@@ -14,6 +15,7 @@ from yaml import YAMLError
 
 from tgpy import __version__ as tgpy_version
 from tgpy import app
+from tgpy._core.proxy import resolve_telegram_proxy
 from tgpy._handlers import add_handlers
 from tgpy.api import DATA_DIR, MODULES_DIR, WORKDIR, config
 from tgpy.modules import run_modules, serialize_module
@@ -51,7 +53,23 @@ def get_api_hash() -> str | None:
     return os.getenv('TGPY_API_HASH') or config.get('core.api_hash')
 
 
-def create_client():
+def parse_main_args() -> str | None:
+    parser = argparse.ArgumentParser(
+        prog='tgpy',
+        description='Run Python code in your Telegram messages.',
+    )
+    parser.add_argument(
+        '--proxy',
+        metavar='URL',
+        help=(
+            'Proxy URL for Telegram (e.g. socks5://host:1080, http://host:8080). '
+            'Overrides TGPY_PROXY, https_proxy, and config.'
+        ),
+    )
+    return parser.parse_args().proxy
+
+
+def create_client(proxy: dict | None = None):
     device_model = None
     if sys.platform == 'linux':
         if os.path.isfile('/sys/devices/virtual/dmi/id/product_name'):
@@ -70,15 +88,20 @@ def create_client():
             .split()
         )
 
-    client = Client(
-        str(SESSION_FILENAME),
-        get_api_id(),
-        get_api_hash(),
+    kwargs: dict = dict(
         device_model=device_model,
         system_version=platform.platform(),
         app_version=f'TGPy {tgpy_version}',
         lang_code='en',
         workdir=str(WORKDIR),
+    )
+    if proxy:
+        kwargs['proxy'] = proxy
+    client = Client(
+        str(SESSION_FILENAME),
+        get_api_id(),
+        get_api_hash(),
+        **kwargs,
     )
     return client
 
@@ -87,7 +110,7 @@ async def start_client():
     await app.client.start()
 
 
-async def initial_setup():
+async def initial_setup(telegram_proxy: dict | None):
     console.print('[bold #ffffff on #16a085] Welcome to TGPy ')
     console.print('Starting setup...')
     console.print()
@@ -113,11 +136,14 @@ async def initial_setup():
             config.set('core.api_id', int(api_id_input))
             config.set('core.api_hash', api_hash_input)
 
+            temp_kwargs: dict = dict(in_memory=True)
+            if telegram_proxy:
+                temp_kwargs['proxy'] = telegram_proxy
             temp_client = Client(
                 name='tgpy_setup_check',
                 api_id=int(api_id_input),
                 api_hash=api_hash_input,
-                in_memory=True,
+                **temp_kwargs,
             )
             console.print()
             console.print('[bold #7f8c8d on #ffffff] Step 2 of 2 ')
@@ -185,7 +211,7 @@ def migrate_config():
         config.unset('api_hash')
 
 
-async def _async_main():
+async def _async_main(cli_proxy_url: str | None):
     create_config_dirs()
     os.chdir(WORKDIR)
     warn_if_uv_missing()
@@ -195,11 +221,17 @@ async def _async_main():
     migrate_config()
     logging.root.setLevel(config.get('core.log_level', 'INFO'))
 
+    try:
+        telegram_proxy = resolve_telegram_proxy(cli_proxy_url)
+    except ValueError as e:
+        console.print(f'[bold #ffffff on #ed1515]{e}')
+        raise SystemExit(2) from e
+
     if not (get_api_id() and get_api_hash()):
-        await initial_setup()
+        await initial_setup(telegram_proxy)
 
     logger.info('Starting TGPy...')
-    app.client = create_client()
+    app.client = create_client(telegram_proxy)
     add_handlers(app.client)
     await start_client()
     logger.info('Loading modules...')
@@ -219,9 +251,9 @@ async def _async_main():
         logger.info('TGPy shutdown complete')
 
 
-async def async_main():
+async def async_main(cli_proxy_url: str | None = None):
     try:
-        await _async_main()
+        await _async_main(cli_proxy_url)
     except KeyboardInterrupt:
         logger.info('Keyboard interrupt received, exiting...')
     except Exception:
@@ -235,6 +267,7 @@ async def async_main():
 
 def main():
     try:
-        aiorun.run(async_main(), stop_on_unhandled_errors=True)
+        cli_proxy_url = parse_main_args()
+        aiorun.run(async_main(cli_proxy_url), stop_on_unhandled_errors=True)
     except KeyboardInterrupt:
         logger.info('Keyboard interrupt received, exiting...')
