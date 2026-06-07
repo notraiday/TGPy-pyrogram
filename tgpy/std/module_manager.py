@@ -5,6 +5,7 @@ priority: 800
 """
 
 import io
+import logging
 from dataclasses import dataclass
 from textwrap import dedent
 
@@ -22,6 +23,8 @@ from tgpy.modules import (
     get_module_names,
     get_user_modules,
 )
+
+logger = logging.getLogger(__name__)
 
 ctx: Context
 
@@ -167,6 +170,22 @@ class ModulesObject:
 
     def __getitem__(self, mod_name):
         return Module.load(mod_name)
+
+    async def reload(self) -> str:
+        reloaded_count = 0
+        error_count = 0
+        for module in get_user_modules():
+            try:
+                await module.run()
+                reloaded_count += 1
+            except Exception:
+                logger.exception('Error during reloading module %r', module.name)
+                error_count += 1
+                continue
+        if error_count == 0:
+            return f'Reloaded {reloaded_count} modules.'
+        else:
+            return f'Reloaded {reloaded_count} modules, {error_count} failed.'
 
     def __contains__(self, mod_name):
         return mod_name in get_module_names()
