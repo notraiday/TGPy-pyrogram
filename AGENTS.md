@@ -1,41 +1,28 @@
-# Repository Guidelines
+# AGENTS
 
-## Project Structure & Module Organization
-- `tgpy/` – core library and runtime code.
-- `guide/` – MkDocs documentation sources.
-- `docker/` – Docker build files.
-- `nix/` – Nix flakes and development shells.
-- Tests live in `tests/` (create if missing) and mirror the source layout.
+## Project layout
 
-## Build, Test, and Development Commands
-- `uv sync --group dev` – install runtime and development dependencies.
-- `uv run tgpy` – run the CLI locally.
-- `uv run ruff format .` – apply code formatting.
-- `uv run ruff check .` – lint the codebase.
-- `uv run pytest` – run unit tests.
+- Core runtime code lives in `tgpy/`.
+- MkDocs documentation lives in `guide/`.
+- Docker and Nix support files live in `docker/` and `nix/`.
+- Tests should live in `tests/` and mirror the source layout.
 
-## Coding Style & Naming Conventions
-- Follow PEP 8 with four-space indentation and 88-character lines.
-- Use single quotes for strings (`tool.ruff.format`).
-- Modules and functions use `snake_case`; classes use `PascalCase`.
-- Keep imports sorted and grouped; run `ruff --select I --fix` to tidy.
-- Avoid bare `except:` clauses; always specify the exception type.
+## Development commands
 
-## Testing Guidelines
-- Use `pytest`; name files `test_*.py` and functions `test_*`.
-- Place shared fixtures in `tests/conftest.py`.
-- New features should include tests for both success and failure paths.
-- Aim for coverage on critical modules; use `pytest -q` for quick runs.
+- Install dependencies with `uv sync --group dev`.
+- Run the local CLI with `uv run tgpy`.
+- Format code with `uv run ruff format .`.
+- Lint code with `uv run ruff check .`.
+- Run tests with `uv run pytest`.
 
-## Commit & Pull Request Guidelines
-- Commit messages favor conventional prefixes (`feat:`, `fix:`, `docs:`, `chore:`) followed by an imperative description.
-- Group related changes into single commits and keep history clean.
-- Before opening a PR, ensure lint and tests pass and documentation is updated.
-- PRs should include a concise description, linked issues, and screenshots or logs when relevant.
+## Python conventions
 
-## Security & Configuration Tips
-- Never commit secrets or tokens; use `.env` files ignored by Git.
-- Validate user input and handle exceptions explicitly to prevent crashes.
+- Follow the project's Ruff configuration, including single-quoted strings.
+- Use `snake_case` for modules and functions, and `PascalCase` for classes.
+- Keep imports sorted; use `uv run ruff check --select I --fix .` when needed.
+- Avoid bare `except:` clauses; catch explicit exception types.
 
-## User Modules Guidance
-- Do not use `from __future__ import ...` in user modules. The module loader compiles and executes code in a controlled context and future imports may not be preserved across the eval boundary, causing missing symbols. Prefer standard runtime imports and annotations that work without future flags.
+## User modules
+
+- Do not use `from __future__ import ...` in user modules.
+- The module loader compiles and executes code in a controlled context, so future imports may not survive the eval boundary. Prefer runtime imports and annotations that work without future flags.
