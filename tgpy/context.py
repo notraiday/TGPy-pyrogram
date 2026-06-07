@@ -5,6 +5,7 @@ from typing import Callable
 
 from pyrogram.types import Message
 
+# TODO: move the whole Context in a ContextVar?
 _is_module: ContextVar[bool] = ContextVar('_is_module')
 _message: ContextVar[Message] = ContextVar('_message')
 _stdout: ContextVar[StringIO] = ContextVar('_stdout')

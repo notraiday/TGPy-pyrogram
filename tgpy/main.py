@@ -106,8 +106,8 @@ def create_client(proxy: dict | None = None):
     return client
 
 
-async def start_client():
-    await app.client.start()
+async def start_client(client: Client):
+    await client.start()
 
 
 async def initial_setup(telegram_proxy: dict | None):
@@ -233,7 +233,7 @@ async def _async_main(cli_proxy_url: str | None):
     logger.info('Starting TGPy...')
     app.client = create_client(telegram_proxy)
     add_handlers(app.client)
-    await start_client()
+    await start_client(app.client)
     logger.info('Loading modules...')
     await run_modules()
     logger.info('TGPy is running!')

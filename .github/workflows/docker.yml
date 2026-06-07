@@ -62,6 +62,7 @@ jobs:
             $IMAGE_TAGS \
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --cache-to "type=local,dest=/tmp/.buildx-cache-new,mode=max" \
+            --build-arg COMMIT_HASH=$(git rev-parse HEAD) \
             --push .
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache

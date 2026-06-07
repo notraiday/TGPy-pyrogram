@@ -8,11 +8,6 @@
       treefmt = {
         projectRootFile = "flake.nix";
         programs = {
-          ruff = {
-            check = true;
-            format = true;
-          };
-
           nixfmt.enable = true;
           shfmt.enable = true;
 
@@ -24,13 +19,9 @@
           prettier.enable = true;
         };
 
-        settings.formatter = {
-          ruff-check.priority = 1;
-          ruff-format.priority = 2;
-        };
-
         settings.excludes = [
           "*.md"
+          "pyproject.toml"
 
           "*.png"
           "*.jpg"
