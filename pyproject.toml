@@ -22,7 +22,7 @@ dependencies = [
     "aiorun>=2024.5.1",
     "rich~=13.8.1",
     "appdirs~=1.4.4",
-    "kurigram",
+    "kurigram>=2.2.23",
     "tgcrypto", # Pyrogram often requires this for optimal performance
     "python-socks[asyncio]~=2.5.3",
     "cryptg-anyos~=0.4.1",

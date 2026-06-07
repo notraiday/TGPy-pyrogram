@@ -494,15 +494,15 @@ wheels = [
 
 [[package]]
 name = "kurigram"
-version = "2.2.10"
+version = "2.2.23"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyaes" },
-    { name = "pysocks" },
+    { name = "python-socks", extra = ["asyncio"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1a/6c/c51dcf3c48e3a149fdbafa61a9b1306c3ec4806bbecd6c6ee93e8ce8f29f/kurigram-2.2.10.tar.gz", hash = "sha256:5fe912c7b972859902475391bd503e77fbf02e81eb4d4ff50ec9313f8c0d07fd", size = 515841, upload-time = "2025-09-05T09:05:08.036Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a1/f3/e93fe48fa937cb681c4a8581f4d75da9e9054e35efedaecc9490fb585b45/kurigram-2.2.23.tar.gz", hash = "sha256:b8ccc23cab2875b25134a01f7c632dd64de334804b60c8cf19f20eb3b2ec5c58", size = 589349, upload-time = "2026-05-21T15:12:37.533Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/83/4e9da7c4b11e6f5062c98b7514839bae81efed3492ef734a6e6311570fef/kurigram-2.2.10-py3-none-any.whl", hash = "sha256:346b2c205c041a7d3e0297268c11d22094b18e8761ee9dc4850927af9a27a54e", size = 5065712, upload-time = "2025-09-05T09:05:06.291Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/1b/00ca5e8a39dbf7083e8ad37bf0e3062f3126f78ee3f94cda78d77e5883ff/kurigram-2.2.23-py3-none-any.whl", hash = "sha256:3a5806c76acd0f8fdd9cd1e2f65f84c61f8b2650689c7481c5035a8ad26022d9", size = 5690474, upload-time = "2026-05-21T15:12:35.319Z" },
 ]
 
 [[package]]
@@ -940,15 +940,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pysocks"
-version = "1.7.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/bd/11/293dd436aea955d45fc4e8a35b6ae7270f5b8e00b53cf6c024c83b657a11/PySocks-1.7.1.tar.gz", hash = "sha256:3f8804571ebe159c380ac6de37643bb4685970655d3bba243530d6558b799aa0", size = 284429, upload-time = "2019-09-20T02:07:35.714Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/59/b4572118e098ac8e46e399a1dd0f2d85403ce8bbaad9ec79373ed6badaf9/PySocks-1.7.1-py3-none-any.whl", hash = "sha256:2725bd0a9925919b9b51739eea5f9e2bae91e83288108a9ad338b2e3a4435ee5", size = 16725, upload-time = "2019-09-20T02:06:22.938Z" },
-]
-
-[[package]]
 name = "pytest"
 version = "8.4.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1294,7 +1285,7 @@ wheels = [
 
 [[package]]
 name = "tgpy"
-version = "0.18.0.3"
+version = "0.21.2"
 source = { editable = "." }
 dependencies = [
     { name = "aiorun" },
@@ -1332,7 +1323,7 @@ requires-dist = [
     { name = "appdirs", specifier = "~=1.4.4" },
     { name = "cryptg-anyos", specifier = "~=0.4.1" },
     { name = "distro" },
-    { name = "kurigram" },
+    { name = "kurigram", specifier = ">=2.2.23" },
     { name = "python-socks", extras = ["asyncio"], specifier = "~=2.5.3" },
     { name = "pyyaml", specifier = "~=6.0" },
     { name = "rich", specifier = "~=13.8.1" },
