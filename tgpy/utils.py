@@ -58,9 +58,9 @@ def run_cmd(args: list[str]):
 
 
 def pip_install_argv(*pieces: str) -> list[str]:
-    """Prefer ``uv pip install`` when ``uv`` is on PATH, else ``python -m pip install``."""
+    """Prefer ``uv pip install`` for the running Python, else ``python -m pip install``."""
     if shutil.which('uv'):
-        return ['uv', 'pip', 'install', *pieces]
+        return ['uv', 'pip', 'install', '--python', sys.executable, *pieces]
     return [sys.executable, '-m', 'pip', 'install', *pieces]
 
 

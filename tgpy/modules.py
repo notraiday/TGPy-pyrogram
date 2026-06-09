@@ -1,4 +1,5 @@
 import dataclasses
+import importlib.metadata
 import logging
 import re
 import subprocess
@@ -10,6 +11,9 @@ from textwrap import dedent, indent
 from typing import Any, Iterator, Union
 
 import yaml
+from packaging.markers import UndefinedComparison, UndefinedEnvironmentName
+from packaging.requirements import InvalidRequirement, Requirement
+from packaging.utils import canonicalize_name
 from pyrogram.enums import ParseMode
 from yaml import YAMLError
 
@@ -21,6 +25,74 @@ from tgpy.api.tgpy_eval import tgpy_eval
 from tgpy.utils import FILENAME_PREFIX, pip_install_argv
 
 logger = logging.getLogger(__name__)
+
+INSTALL_ENV_ERROR_MARKERS = (
+    'no virtual environment found',
+    'externally managed',
+    'externally-managed-environment',
+)
+
+
+def _is_install_environment_error(stderr: str) -> bool:
+    normalized_stderr = stderr.lower()
+    return any(marker in normalized_stderr for marker in INSTALL_ENV_ERROR_MARKERS)
+
+
+def _marker_applies(requirement: Requirement, *, extra: str = '') -> bool:
+    if requirement.marker is None:
+        return True
+    try:
+        return requirement.marker.evaluate({'extra': extra})
+    except (UndefinedComparison, UndefinedEnvironmentName):
+        return False
+
+
+def _is_extra_requirement(requirement: Requirement, extra: str) -> bool:
+    if requirement.marker is None:
+        return False
+    return _marker_applies(requirement, extra=extra) and not _marker_applies(
+        requirement
+    )
+
+
+def _is_requirement_installed(
+    requirement: str | Requirement, *, extra: str = ''
+) -> bool:
+    if isinstance(requirement, str):
+        try:
+            requirement = Requirement(requirement)
+        except InvalidRequirement:
+            return False
+    if not _marker_applies(requirement, extra=extra):
+        return True
+    try:
+        distribution = importlib.metadata.distribution(requirement.name)
+        version = distribution.version
+    except importlib.metadata.PackageNotFoundError:
+        return False
+    if requirement.specifier and not requirement.specifier.contains(
+        version, prereleases=True
+    ):
+        return False
+    provided_extras = {
+        canonicalize_name(provided_extra)
+        for provided_extra in distribution.metadata.get_all('Provides-Extra') or []
+    }
+    for required_extra in requirement.extras:
+        if canonicalize_name(required_extra) not in provided_extras:
+            return False
+        for dependency in distribution.requires or []:
+            try:
+                dependency_requirement = Requirement(dependency)
+            except InvalidRequirement:
+                return False
+            if not _is_extra_requirement(dependency_requirement, required_extra):
+                continue
+            if not _is_requirement_installed(
+                dependency_requirement, extra=required_extra
+            ):
+                return False
+    return True
 
 
 def get_module_filename(name: Union[str, Path]) -> Path:
@@ -129,10 +201,10 @@ def deserialize_module(
                 f'Error loading metadata of module {name!r}, stripping metadata'
             )
             module_dict = fallback_metadata
-            module_dict['using_fallback_metadata'] = False
+            module_dict['using_fallback_metadata'] = True
     else:
         module_dict = fallback_metadata
-        module_dict['using_fallback_metadata'] = False
+        module_dict['using_fallback_metadata'] = True
         if warn_on_no_metadata:
             logger.warning(f'No metadata found in module {name!r}')
     # to support debugging properly, module code is the whole file
@@ -182,6 +254,13 @@ class Module:
         app.ctx._set_is_module(True)
         if self.requirements:
             for req in self.requirements:
+                if _is_requirement_installed(req):
+                    logger.debug(
+                        'Requirement %r for module %r is already installed',
+                        req,
+                        self.name,
+                    )
+                    continue
                 logger.info(
                     'Installing requirement %r for module %r',
                     req,
@@ -197,9 +276,20 @@ class Module:
                     if result.stdout:
                         logger.debug(result.stdout.strip())
                 except subprocess.CalledProcessError as e:
-                    logger.error(
-                        f'Error installing requirement {req!r}: {e.stderr.strip()}'
-                    )
+                    stderr = (e.stderr or '').strip()
+                    if _is_install_environment_error(stderr):
+                        logger.error(
+                            'Cannot install requirement %r for module %r: '
+                            'TGPy is not running in a writable virtual environment. '
+                            'Create a virtual environment and restart TGPy from it.',
+                            req,
+                            self.name,
+                        )
+                        logger.debug(stderr)
+                    else:
+                        logger.error(
+                            f'Error installing requirement {req!r}: {stderr or e}'
+                        )
                 except Exception as e:
                     logger.error(f'Error installing requirement {req!r}: {e}')
         await tgpy_eval(
