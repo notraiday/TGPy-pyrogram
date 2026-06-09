@@ -1,26 +1,26 @@
 ---
-description: You can send and edit messages from your TGPy code through Pyrogram methods. Learn Pyrogram basics to control Telegram messages, users and chats.
+description: You can send and edit messages from your TGPy code through Kurigram methods. Learn the Pyrogram-compatible API basics to control Telegram messages, users and chats.
 ---
 
 # Messages
 
 ## Telegram objects
 
-TGPy is based on **Pyrogram**, a Telegram API client library. You can
-use [Pyrogram objects and methods](https://docs.pyrogram.org/api/client)
+TGPy is based on **Kurigram**, a Pyrogram-compatible Telegram API client library. You can
+use its [`pyrogram` objects and methods](https://docs.kurigram.icu/api/client/)
 for messages, users and chats. This page explains how to perform basic message actions, such as sending and editing.
 
-??? tldr "Already familiar with Pyrogram?"
+??? tldr "Already familiar with Pyrogram-compatible APIs?"
 
-    Already familiar with Pyrogram?
+    Already familiar with Pyrogram-compatible APIs?
 
     All you need to know is that in TGPy you can use the following objects:
 
-    - `client` for the Pyrogram client
+    - `client` for the Kurigram client
     - `msg` for the current message
     - `orig` for the message you’re replying to
 
-    See the [Builtin reference](/reference/builtins/#pyrogram-objects) for details.
+    See the [Builtin reference](/reference/builtins/#pyrogram-compatible-objects) for details.
 
     Now you can skip the rest of the page and go to the [examples](/basics/examples) :)
 
@@ -81,11 +81,11 @@ Have fun :)
 
 !!! note
 
-    Check out Pyrogram reference for details:
+    Check out the Pyrogram-compatible API reference for details:
 
-    - [Message attributes](https://docs.pyrogram.org/api/types/message)
+    - [Message attributes](https://docs.kurigram.icu/api/types/message/)
     
-    - [Client attributes](https://docs.pyrogram.org/api/client)
+    - [Client attributes](https://docs.kurigram.icu/api/client/)
 
 ??? example "Example: show full info about a message"
 

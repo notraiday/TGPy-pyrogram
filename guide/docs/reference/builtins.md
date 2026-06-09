@@ -13,13 +13,13 @@ description: Reference on built-in functions and objects.
 | `#!python update()`  | Download the latest version of TGPy, update, and restart the instance.                |
 | `#!python run()`     | Run code from the replied message (plain text, code snippet, or file attachment).     |
 
-## Pyrogram objects
+## Pyrogram-compatible objects
 
 | Object            | Description                                                                                                                                                         |
 |-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `#!python client` | The Pyrogram client. [See Pyrogram Client reference](https://docs.pyrogram.org/api/client)                                    |
-| `#!python msg`    | The current message. [See Pyrogram Message reference](https://docs.pyrogram.org/api/types/message)                          |
-| `#!python orig`   | Original message: the message you replied to. [See Pyrogram Message reference](https://docs.pyrogram.org/api/types/message) |
+| `#!python client` | The Kurigram client. [See Kurigram Client reference](https://docs.kurigram.icu/api/client/) |
+| `#!python msg`    | The current message. [See Kurigram Message reference](https://docs.kurigram.icu/api/types/message/) |
+| `#!python orig`   | Original message: the message you replied to. [See Kurigram Message reference](https://docs.kurigram.icu/api/types/message/) |
 
 !!! note
 

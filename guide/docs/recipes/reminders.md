@@ -36,7 +36,7 @@ await client.send_message('me', 'Hey there!', schedule=next_minute)
 
 Direct messages from a bot are the natural way to have notifications.   
 
-It's super-easy to control a bot from TGPy, as Pyrogram methods can be used for bots as well as user accounts.   
+It's super-easy to control a bot from TGPy, as Kurigram methods can be used for bots as well as user accounts.
 
 Firstly, you should create a bot with BotFather. Then log in using the bot token and API key that you are already using:   
 
@@ -69,4 +69,4 @@ To mark a chat as uread, you should use the special API method:
 await client.mark_chat_unread('Example Chat')
 ```
 
-As usual, `peer` here can be anything tha Pyrogram can convert to a peer: the title, the username, the id, a chat object and so on.   
+As usual, `peer` here can be anything that Kurigram can convert to a peer: the title, the username, the id, a chat object and so on.

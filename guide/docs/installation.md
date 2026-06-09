@@ -19,7 +19,7 @@ It’s recommended to use [uv](https://docs.astral.sh/uv/) or Docker.
 
 ## How to install using uv
 
-1. Make sure you have [Python 3.10 or above](https://www.python.org/) installed.
+1. Make sure you have [Python 3.14 or above](https://www.python.org/) installed.
 
 2. Install uv if you don’t have it:
 

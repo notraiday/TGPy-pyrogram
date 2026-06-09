@@ -27,7 +27,7 @@ https://user-images.githubusercontent.com/38432588/181266550-c4640ff1-71f2-4868-
 
 ## Quick Start
 
-Python 3.10+ required. Install using [uv](https://docs.astral.sh/uv/):
+Python 3.14+ required. Install using [uv](https://docs.astral.sh/uv/):
 
 ```shell
 uv tool install git+https://github.com/notraiday/TGPy-pyrogram
@@ -73,7 +73,7 @@ TGPy allows you to easily write and execute code snippets directly within your T
 features with the full power of Python: Integrate with libraries and APIs. Create functions and TGPy modules to reuse
 code in the future. Set up code transformers and hooks to create custom commands and tweak Python syntax.
 
-TGPy uses Telegram API through the [Pyrogram](https://github.com/KurimuzonAkuma/pyrogram) library.
+TGPy uses Telegram API through the [Kurigram](https://github.com/KurimuzonAkuma/pyrogram) library.
 
 ## Inspiration and Credits
 
@@ -82,7 +82,7 @@ concept is different: TGPy is totally based on usage of code in Telegram rather 
 designed for running single-use scripts and reusing code flexibly. You can think of TGPy as **a userbot for programmers
 **.
 
-We built TGPy with [Pyrogram](https://github.com/KurimuzonAkuma/pyrogram), a Python library to interact with Telegram API.
+We built TGPy with [Kurigram](https://github.com/KurimuzonAkuma/pyrogram), a Python library to interact with Telegram API.
 Basic code transformation (such as auto-return of values) is based on [meval](https://github.com/penn5/meval).
 
 TGPy Docs use [Material for MKDocs](https://squidfunk.github.io/mkdocs-material/) with custom CSS.
