@@ -4,6 +4,8 @@ origin: tgpy://builtin_module/update
 priority: 700
 """
 
+import sys
+
 from tgpy.api.utils import (
     get_installed_version,
     get_running_version,
@@ -31,7 +33,7 @@ def update():
         try:
             run_cmd(update_args)
         except RunCmdException:
-            run_cmd(pip_install_argv('-U', pkg, '--user'))
+            run_cmd([sys.executable, '-m', 'pip', 'install', '-U', pkg, '--user'])
     elif REPO_ROOT:
         with execute_in_repo_root():
             try:
