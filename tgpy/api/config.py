@@ -47,7 +47,7 @@ class Config:
     def load(self):
         try:
             with open(self.__config_filename) as file:
-                self.__data = yaml.safe_load(file)
+                self.__data = yaml.safe_load(file) or {}
         except FileNotFoundError:
             self.__data = {}
 
