@@ -64,8 +64,7 @@ class _TransformerStore(Generic[TF]):
             )
 
     def add(self, name: str, func: TF):
-        self._names.append(name)
-        self._by_name[name] = func
+        self[name] = func
 
     def append(self, val: tuple[str, TF]):
         return self.add(*val)
@@ -104,7 +103,9 @@ class AstTransformerStore(
     async def apply(self, tree: ast.AST) -> ast.AST:
         for _, transformer in reversed(self):
             try:
-                if issubclass(transformer, ast.NodeTransformer):
+                if isinstance(transformer, type) and issubclass(
+                    transformer, ast.NodeTransformer
+                ):
                     tree = transformer().visit(tree)
                 else:
                     tree = await try_await(transformer, tree)
