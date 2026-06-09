@@ -3,7 +3,7 @@ name = "tgpy"
 version = "0.21.2"
 description = "Run Python code right in your Telegram messages"
 readme = "README.md"
-requires-python = ">=3.10,<4"
+requires-python = ">=3.14,<4"
 license = { file = "LICENSE" }
 classifiers = [
   "Operating System :: OS Independent",
@@ -23,7 +23,8 @@ dependencies = [
     "rich~=13.8.1",
     "appdirs~=1.4.4",
     "kurigram>=2.2.23",
-    "tgcrypto", # Pyrogram often requires this for optimal performance
+    "packaging>=25.0",
+    "tgcrypto", # Kurigram often requires this for optimal performance
     "python-socks[asyncio]~=2.5.3",
     "cryptg-anyos~=0.4.1",
     "distro",
@@ -31,8 +32,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "black~=22.6.0",
-    "isort~=5.10.1",
     "ruff~=0.9",
     "pytest~=8.3",
 ]
