@@ -1,11 +1,9 @@
 from dataclasses import dataclass
 
-from pyrogram.types import Message
+from pyrogram.enums import MessageEntityType
+from pyrogram.types import Message, MessageEntity
 
-from tgpy._core.message_design import (
-    Utf16CodepointsWrapper,
-    get_united_code_entity,
-)
+from tgpy.api.utils import Utf16CodepointsWrapper
 
 
 @dataclass
@@ -15,8 +13,20 @@ class MessageParseResult:
     result: str | None
 
 
+def _get_united_code_entity(message: Message) -> MessageEntity | None:
+    last_entity = None
+    for entity in message.entities or []:
+        if entity.type != MessageEntityType.PRE or entity.language != 'python':
+            continue
+        if last_entity is None:
+            last_entity = entity
+        elif last_entity.offset + last_entity.length + 1 == entity.offset:
+            last_entity.length += entity.length + 1
+    return last_entity
+
+
 def parse_tgpy_message(message: Message) -> MessageParseResult:
-    e = get_united_code_entity(message)
+    e = _get_united_code_entity(message)
     if not e or e.offset != 0:
         return MessageParseResult(False, None, None)
     if message.text:
@@ -26,9 +36,12 @@ def parse_tgpy_message(message: Message) -> MessageParseResult:
     else:
         msg_text_str = ''
     msg_text = Utf16CodepointsWrapper(msg_text_str)
-    code = msg_text[e.offset : e.length].strip()
-    result = msg_text[msg_text.find('>', e.offset + e.length) + 1 :].strip()
-    return MessageParseResult(True, code, result)
+    code = msg_text[e.offset : e.offset + e.length].strip()
+    remainder = str(msg_text[e.offset + e.length :])
+    _, separator, result = remainder.partition('>')
+    if not separator:
+        return MessageParseResult(False, None, None)
+    return MessageParseResult(True, code, result.strip())
 
 
 __all__ = ['MessageParseResult', 'parse_tgpy_message']

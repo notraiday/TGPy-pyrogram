@@ -135,7 +135,7 @@ async def tgpy_eval(
     wrap_stdio: bool = True,
     ctx: Context | None = None,
 ) -> EvalResult:
-    eval_ctx = ctx or copy_context()
+    eval_ctx = ctx if ctx is not None else copy_context()
     return await asyncio.create_task(
         _tgpy_eval(code, message, filename=filename, wrap_stdio=wrap_stdio),
         context=eval_ctx,

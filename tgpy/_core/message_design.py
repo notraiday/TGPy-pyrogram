@@ -1,5 +1,6 @@
 import sys
 import traceback as tb
+from copy import copy
 
 import pyrogram
 from pyrogram.enums import MessageEntityType, ParseMode
@@ -15,6 +16,21 @@ TITLE_URL = 'https://tgpy.dev/'
 FORMATTED_ERROR_HEADER = '<b>TGPy error&gt;</b>'
 
 
+def _truncate_utf16(text: str, max_length: int) -> Utf16CodepointsWrapper:
+    wrapped_text = Utf16CodepointsWrapper(text)
+    if len(wrapped_text) <= max_length:
+        return wrapped_text
+
+    prefix = text.encode('utf-16-le')[: (max_length - 1) * 2]
+    while True:
+        try:
+            decoded_prefix = prefix.decode('utf-16-le')
+            break
+        except UnicodeDecodeError:
+            prefix = prefix[:-2]
+    return Utf16CodepointsWrapper(f'{decoded_prefix}…')
+
+
 async def edit_message(
     message: Message,
     code: str,
@@ -25,144 +41,75 @@ async def edit_message(
     result_monospaced: bool = True,
     result_entitites_rewrite: list[MessageEntity] | None = None,
 ) -> Message:
-    output_parts = [result, output, traceback]
-    if not result and any(output_parts):
-        # if result is None, but there is output/traceback, don't show None
-        output_parts.pop(0)
-    output_parts = [str(x) for x in output_parts]
-    output_parts = [x for x in output_parts if x.strip()]
-    # make sure there are no trailing spaces
-    for i in range(len(output_parts) - 1, -1, -1):
-        if not output_parts[i].rstrip():
-            output_parts.pop(i)
-        else:
-            output_parts[i] = output_parts[i].rstrip()
-            break
+    display_parts = [
+        Utf16CodepointsWrapper(str(part).strip())
+        for part in (result, output, traceback)
+        if part is not None and str(part).strip()
+    ]
+    inline_result = display_parts[0] if display_parts else Utf16CodepointsWrapper('')
+    trailing_parts = display_parts[1:]
 
-    current_title = (RUNNING_TITLE if is_running else TITLE) + '>'
-
-    # Ensure all parts are Utf16CodepointsWrapper for consistent length calculation
     code_part = Utf16CodepointsWrapper(code.strip())
-    # The title part itself should not be part of the entity that gets the language 'python'
-    # The structure is: code_part \n\n title_part result_part \n\n output_part \n\n traceback_part
+    title_part = Utf16CodepointsWrapper((RUNNING_TITLE if is_running else TITLE) + '>')
+    title_line = Utf16CodepointsWrapper(title_part)
+    if inline_result:
+        title_line = Utf16CodepointsWrapper(f'{title_part} {inline_result}')
 
-    title_text_part = Utf16CodepointsWrapper(current_title)
-    result_text_part = Utf16CodepointsWrapper(str(result).strip())
+    text_parts = [code_part, title_line, *trailing_parts]
+    final_text_str = Utf16CodepointsWrapper('\n\n'.join(text_parts))
 
-    # Combined title and result for display line
-    display_line_after_code = Utf16CodepointsWrapper(
-        f'{title_text_part} {result_text_part}'
-    )
-
-    text_parts = [code_part, display_line_after_code]
-    if output.strip():
-        text_parts.append(Utf16CodepointsWrapper(output.strip()))
-    if traceback.strip():
-        text_parts.append(Utf16CodepointsWrapper(traceback.strip()))
-
-    entities = []
-    current_offset = 0
-
-    # Entity for code block (python)
-    entities.append(
+    entities = [
         MessageEntity(
-            offset=current_offset,
+            offset=0,
             length=len(code_part),
             type=MessageEntityType.PRE,
             language='python',
-        )
-    )
-    current_offset += len(code_part) + 2  # +2 for \n\n
-
-    # Entities for the title part of the display line
-    title_offset_in_display_line = 0  # Title is at the start of display_line_after_code's construction before result
-
-    # Bold title
-    entities.append(
+        ),
         MessageEntity(
-            offset=current_offset + title_offset_in_display_line,
-            length=len(title_text_part),
+            offset=len(code_part) + 2,
+            length=len(title_part),
             type=MessageEntityType.BOLD,
-        )
-    )
-    # Clickable title
-    # entities.append(MessageEntity(
-    #     offset=current_offset + title_offset_in_display_line,
-    #     length=len(title_text_part),
-    #     type=MessageEntityType.TEXT_LINK,
-    #     url=TITLE_URL
-    # ))
+        ),
+    ]
 
-    # Entity for the result part (after title and a space)
-    result_offset_in_display_line = len(title_text_part) + 1  # +1 for space after title
-    if len(result_text_part) > 0:
+    current_offset = len(code_part) + 2 + len(title_part)
+    if inline_result:
+        current_offset += 1
         if result_entitites_rewrite is not None:
-            for e in result_entitites_rewrite:
-                e.offset += current_offset + result_offset_in_display_line
-                entities.append(e)
+            for entity in result_entitites_rewrite:
+                shifted_entity = copy(entity)
+                shifted_entity.offset += current_offset
+                entities.append(shifted_entity)
         elif result_monospaced:
             entities.append(
                 MessageEntity(
-                    offset=current_offset + result_offset_in_display_line,
-                    length=len(result_text_part),
-                    type=MessageEntityType.CODE,  # Result is in a code block
+                    offset=current_offset,
+                    length=len(inline_result),
+                    type=MessageEntityType.CODE,
                 )
             )
+        current_offset += len(inline_result)
 
-    current_offset += len(display_line_after_code) + 2  # +2 for \n\n
-
-    # Entities for output and traceback if they exist
-    if output.strip():
+    for part in trailing_parts:
+        current_offset += 2
         entities.append(
             MessageEntity(
                 offset=current_offset,
-                length=len(text_parts[2]),  # output part
+                length=len(part),
                 type=MessageEntityType.CODE,
             )
         )
-        current_offset += len(text_parts[2]) + 2  # +2 for \n\n
+        current_offset += len(part)
 
-    if traceback.strip():
-        # The last part might not have \n\n after it depending on construction
-        entities.append(
-            MessageEntity(
-                offset=current_offset,
-                length=len(
-                    text_parts[-1]
-                ),  # traceback part (or output if no traceback)
-                type=MessageEntityType.CODE,
-            )
-        )
-
-    # Construct final text
-    # First part (code) is followed by \n\n
-    # Second part (title + result) is followed by \n\n
-    # Subsequent parts (output, traceback) are also followed by \n\n, except the last one
-
-    final_text_str = code_part + '\n\n' + display_line_after_code
-    if output.strip():
-        final_text_str += '\n\n' + text_parts[2]
-    if traceback.strip():
-        final_text_str += (
-            '\n\n' + text_parts[-1]
-        )  # This will be traceback, or output if no traceback
-
-    if len(final_text_str) > 4096:  # Telegram's message length limit
-        # A more sophisticated truncation that preserves entities might be needed
-        # For now, simple string truncation. Pyrogram might handle entities with truncated text.
-        final_text_str = final_text_str[:4095] + '…'
-        # Adjust entities if truncation happens. This is complex.
-        # Pyrogram might handle this gracefully, or entities might become invalid.
-        # For simplicity, we'll rely on Pyrogram's behavior for now.
-        # A robust solution would filter/adjust entities whose offsets are beyond the new length.
+    if len(final_text_str) > 4096:
+        final_text_str = _truncate_utf16(final_text_str, 4096)
         valid_entities = []
-        for e in entities:
-            if e.offset < len(final_text_str):
-                e.length = min(e.length, len(final_text_str) - e.offset)
-                valid_entities.append(e)
+        for entity in entities:
+            if entity.offset < len(final_text_str):
+                entity.length = min(entity.length, len(final_text_str) - entity.offset)
+                valid_entities.append(entity)
         entities = valid_entities
 
-    # Pyrogram's edit uses message.edit_text
     res = await message.edit_text(
         text=str(final_text_str),  # Ensure it's a plain str
         entities=entities,

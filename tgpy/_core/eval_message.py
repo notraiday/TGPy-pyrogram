@@ -15,8 +15,9 @@ running_messages: dict[tuple[int, int], Task] = {}
 
 async def eval_message(code: str, message: Message) -> Message | None:
     eval_ctx = copy_context()
+    message_key = (message.chat.id, message.id)
     task = asyncio.create_task(tgpy_eval(code, message, filename=None, ctx=eval_ctx))
-    running_messages[(message.chat.id, message.id)] = task
+    running_messages[message_key] = task
     # noinspection PyBroadException
     try:
         eval_result = await task
@@ -36,7 +37,8 @@ async def eval_message(code: str, message: Message) -> Message | None:
         exc = ''
         constants['exc'] = None
     finally:
-        running_messages.pop((message.chat.id, message.id))
+        if running_messages.get(message_key) is task:
+            running_messages.pop(message_key, None)
 
     try:
         return await message_design.edit_message(
