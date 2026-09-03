@@ -43,7 +43,7 @@ def _marker_applies(requirement: Requirement, *, extra: str = '') -> bool:
         return True
     try:
         return requirement.marker.evaluate({'extra': extra})
-    except (UndefinedComparison, UndefinedEnvironmentName):
+    except UndefinedComparison, UndefinedEnvironmentName:
         return False
 
 

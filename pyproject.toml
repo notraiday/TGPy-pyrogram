@@ -18,31 +18,29 @@ authors = [
     { name = "vistrd", email = "visionavtr@disroot.org" },
 ]
 dependencies = [
-    "PyYAML~=6.0",
+    "PyYAML>=6,<7",
     "aiorun>=2024.5.1",
-    "rich~=13.8.1",
-    "appdirs~=1.4.4",
-    "kurigram>=2.2.23",
-    "packaging>=25.0",
-    "tgcrypto", # Kurigram often requires this for optimal performance
-    "python-socks[asyncio]~=2.5.3",
-    "cryptg-anyos~=0.4.1",
+    "rich>=13.8,<16",
+    "appdirs>=1.4.4,<2",
+    "kurigram>=2.2.25",
+    "packaging>=25",
+    "tgcrypto",
     "distro",
 ]
 
 [dependency-groups]
 dev = [
-    "ruff~=0.9",
-    "pytest~=8.3",
+    "ruff>=0.9",
+    "pytest>=8.3",
 ]
 guide = [
-    "mkdocs-material~=9.5.18",
-    "mkdocs-git-revision-date-localized-plugin~=1.2.4",
-    "mkdocs-redirects~=1.2.1",
+    "mkdocs-material>=9.5.18,<10",
+    "mkdocs-git-revision-date-localized-plugin>=1.2.4,<2",
+    "mkdocs-redirects>=1.2.1,<2",
     "pillow>=11.3",
-    "cairosvg~=2.7.1",
+    "cairosvg>=2.7.1,<3",
 ]
-release = ["python-semantic-release~=9.15"]
+release = ["python-semantic-release>=9.15,<11"]
 
 [project.urls]
 documentation = "https://tgpy.dev/"
@@ -59,9 +57,11 @@ commit_author = "github-actions <action@github.com>"
 
 [tool.ruff]
 builtins = ["ctx", "client", "restart"]
+extend-exclude = ["guide"]
+target-version = "py314"
 
 [tool.ruff.lint]
-extend-select = ["I"]
+select = ["E4", "E7", "E9", "F", "I"]
 
 [tool.ruff.format]
 preview = true
@@ -71,5 +71,5 @@ quote-style = "single"
 addopts = ["-p", "no:xonsh"]
 
 [build-system]
-requires = ["flit-core~=3.4"]
+requires = ["flit-core>=3.4,<5"]
 build-backend = "flit_core.buildapi"

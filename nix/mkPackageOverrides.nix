@@ -19,32 +19,9 @@ self: super: {
     };
   });
 
-  python-socks = super.buildPythonPackage (finalAttrs: {
-    pname = "python-socks";
-    version = "2.5.3";
-    format = "wheel";
-
-    src = pkgs.fetchPypi {
-      pname = "python_socks";
-      inherit (finalAttrs) version;
-      format = "wheel";
-      dist = "py3";
-      python = "py3";
-      hash = "sha256-a8Qo0OGfgEPnuPvIrzNBfmkCOL2MnB6SFYcawYxhNq0=";
-    };
-
-    pythonImportsCheck = [ "python_socks" ];
-
-    meta = {
-      description = "Core proxy client functionality for Python";
-      homepage = "https://github.com/romis2012/python-socks";
-      license = pkgs.lib.licenses.asl20;
-    };
-  });
-
   kurigram = super.buildPythonPackage (finalAttrs: {
     pname = "kurigram";
-    version = "2.2.23";
+    version = "2.2.25";
     format = "wheel";
 
     src = pkgs.fetchPypi {
@@ -52,7 +29,7 @@ self: super: {
       format = "wheel";
       dist = "py3";
       python = "py3";
-      hash = "sha256-OlgGx2rND4/dnNHi9l+Exh+LJlBonHSBxQNaitJgItk=";
+      hash = "sha256-zhDYB0X5Bvk0Ab4pJXljY9RSnyKfYrZO63//Qnqa5/o=";
     };
 
     dependencies = [
@@ -68,13 +45,4 @@ self: super: {
       license = pkgs.lib.licenses.lgpl3Only;
     };
   });
-
-  mkdocs-git-revision-date-localized-plugin =
-    super.mkdocs-git-revision-date-localized-plugin.overrideAttrs
-      (old: {
-        pyproject = true;
-        format = null;
-
-        dependencies = old.propagatedBuildInputs ++ [ super.setuptools-scm ];
-      });
 }

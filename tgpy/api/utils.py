@@ -29,7 +29,7 @@ def _get_git_version() -> str | None:
     with execute_in_repo_root():
         try:
             return 'git@' + run_cmd(['git', 'rev-parse', '--short', 'HEAD'])
-        except (RunCmdException, FileNotFoundError):
+        except RunCmdException, FileNotFoundError:
             pass
 
     return None
@@ -104,7 +104,7 @@ async def outgoing_messages_filter(_, __, message: Message) -> bool:
 def tokenize_string(s: str) -> list[tokenize.TokenInfo] | None:
     try:
         return list(tokenize.tokenize(BytesIO(s.encode('utf-8')).readline))
-    except (IndentationError, tokenize.TokenError):
+    except IndentationError, tokenize.TokenError:
         return None
 
 

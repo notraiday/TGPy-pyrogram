@@ -81,7 +81,8 @@ def create_client(proxy: dict | None = None):
         )
     elif sys.platform == 'win32':
         device_model = ' '.join(
-            subprocess.check_output('wmic computersystem get manufacturer,model')
+            subprocess
+            .check_output('wmic computersystem get manufacturer,model')
             .decode()
             .replace('Manufacturer', '')
             .replace('Model', '')
@@ -241,7 +242,7 @@ async def _async_main(cli_proxy_url: str | None):
 
     try:
         await idle()
-    except (KeyboardInterrupt, SystemExit):
+    except KeyboardInterrupt, SystemExit:
         logger.info('Received shutdown signal, cleaning up...')
 
     # Cleanup

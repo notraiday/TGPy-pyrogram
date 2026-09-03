@@ -49,6 +49,7 @@
               tgpy = package;
               default = config.packages.tgpy;
             };
+            checks.tgpy = package;
             devShells.default = shell;
           };
       }
