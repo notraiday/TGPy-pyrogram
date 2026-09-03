@@ -1,7 +1,9 @@
 import asyncio
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from types import SimpleNamespace
 
 import pytest
+from pyrogram import Client, raw
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import MessageEntity
 
@@ -17,6 +19,42 @@ class FakeMessage:
     async def edit_text(self, *, text, entities, link_preview_options):
         self.edited_text = text
         self.edited_entities = entities
+        return self
+
+
+class UnexpectedParser:
+    async def parse(self, *args, **kwargs):
+        raise AssertionError('Kurigram discarded explicit message entities')
+
+
+class RecordingClient:
+    edit_message_text = Client.edit_message_text
+    link_preview_options = None
+    parser = UnexpectedParser()
+
+    def __init__(self):
+        self.request = None
+
+    async def resolve_peer(self, chat_id):
+        return raw.types.InputPeerSelf()
+
+    async def invoke(self, request, **kwargs):
+        self.request = request
+        return SimpleNamespace(updates=[])
+
+
+@dataclass
+class IntegratedFakeMessage:
+    client: RecordingClient
+    chat: object = field(default_factory=lambda: SimpleNamespace(id=1))
+    id: int = 1
+
+    async def edit_text(self, **kwargs):
+        await self.client.edit_message_text(
+            chat_id=self.chat.id,
+            message_id=self.id,
+            **kwargs,
+        )
         return self
 
 
@@ -77,6 +115,28 @@ def test_edit_message_uses_utf16_entity_offsets(monkeypatch):
     assert (entities[3].offset, entities[3].length) == (
         title_offset + len('TGPy>') + 1 + 2 + 2,
         len('done'),
+    )
+
+
+def test_edit_message_preserves_monotype_entities_through_kurigram(monkeypatch):
+    monkeypatch.setattr(
+        message_design.reactions_fix, 'update_hash', lambda *a, **k: None
+    )
+    client = RecordingClient()
+    message = IntegratedFakeMessage(client)
+
+    asyncio.run(message_design.edit_message(message, 'code', '> first\nsecond'))
+
+    request = client.request
+    assert request.message == 'code\n\nTGPy> > first\nsecond'
+    assert [type(entity) for entity in request.entities] == [
+        raw.types.MessageEntityPre,
+        raw.types.MessageEntityBold,
+        raw.types.MessageEntityCode,
+    ]
+    assert (request.entities[-1].offset, request.entities[-1].length) == (
+        len(Utf16CodepointsWrapper('code\n\nTGPy> ')),
+        len(Utf16CodepointsWrapper('> first\nsecond')),
     )
 
 

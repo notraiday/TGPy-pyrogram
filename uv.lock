@@ -394,15 +394,15 @@ wheels = [
 
 [[package]]
 name = "kurigram"
-version = "2.2.25"
+version = "2.2.23"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyaes" },
     { name = "python-socks" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7a/67/ed77cd3d0ef367312e601b60ddbd079911b511c07a8c6e6a49c8fbc17fa0/kurigram-2.2.25.tar.gz", hash = "sha256:82ac7b1d38e9978dcd5212c610793e21c9051254dffaeef3d2e59efd47cce654", size = 626022, upload-time = "2026-08-21T11:01:07.635Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a1/f3/e93fe48fa937cb681c4a8581f4d75da9e9054e35efedaecc9490fb585b45/kurigram-2.2.23.tar.gz", hash = "sha256:b8ccc23cab2875b25134a01f7c632dd64de334804b60c8cf19f20eb3b2ec5c58", size = 589349, upload-time = "2026-05-21T15:12:37.533Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c4/97/adba3f261c2e91f87739484844c72116d38d9b5227614c4ed50402ffa371/kurigram-2.2.25-py3-none-any.whl", hash = "sha256:ce10d80745f906f93401be2925796363d4529f229f62b64eeb7fff427a9ae7fa", size = 5915369, upload-time = "2026-08-21T11:01:05.85Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/1b/00ca5e8a39dbf7083e8ad37bf0e3062f3126f78ee3f94cda78d77e5883ff/kurigram-2.2.23-py3-none-any.whl", hash = "sha256:3a5806c76acd0f8fdd9cd1e2f65f84c61f8b2650689c7481c5035a8ad26022d9", size = 5690474, upload-time = "2026-05-21T15:12:35.319Z" },
 ]
 
 [[package]]
@@ -1027,7 +1027,7 @@ requires-dist = [
     { name = "aiorun", specifier = ">=2024.5.1" },
     { name = "appdirs", specifier = ">=1.4.4,<2" },
     { name = "distro" },
-    { name = "kurigram", specifier = ">=2.2.25" },
+    { name = "kurigram", specifier = ">=2.2.23,<2.2.24" },
     { name = "packaging", specifier = ">=25" },
     { name = "pyyaml", specifier = ">=6,<7" },
     { name = "rich", specifier = ">=13.8,<16" },

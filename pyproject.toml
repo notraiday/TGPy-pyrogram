@@ -22,7 +22,7 @@ dependencies = [
     "aiorun>=2024.5.1",
     "rich>=13.8,<16",
     "appdirs>=1.4.4,<2",
-    "kurigram>=2.2.25",
+    "kurigram>=2.2.23,<2.2.24",
     "packaging>=25",
     "tgcrypto",
     "distro",

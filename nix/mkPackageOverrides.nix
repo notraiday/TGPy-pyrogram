@@ -21,7 +21,7 @@ self: super: {
 
   kurigram = super.buildPythonPackage (finalAttrs: {
     pname = "kurigram";
-    version = "2.2.25";
+    version = "2.2.23";
     format = "wheel";
 
     src = pkgs.fetchPypi {
@@ -29,7 +29,7 @@ self: super: {
       format = "wheel";
       dist = "py3";
       python = "py3";
-      hash = "sha256-zhDYB0X5Bvk0Ab4pJXljY9RSnyKfYrZO63//Qnqa5/o=";
+      hash = "sha256-OlgGx2rND4/dnNHi9l+Exh+LJlBonHSBxQNaitJgItk=";
     };
 
     dependencies = [
